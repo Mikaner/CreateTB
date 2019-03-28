@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import json
+import settings
 
 prefix = "$"
 voice_client = None
