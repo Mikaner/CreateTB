@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from music.Setting import Settings
+from music.Download import Download
 import json
 from discord.ext.commands import CommandNotFound
 
@@ -22,11 +23,17 @@ class MusicCog(commands.Cog):
         self.voice_client = await voice_channel.connect()
 
     @commands.command()
-    async def play(self, ctx):
+    async def play(self, ctx, *args):
         if self.voice_client is None:
-            voice_channel = ctx.guild.voice_channels[0]
+            # if not joined
+            if ctx.author.voice.channel is not None:
+                voice_channel = ctx.author.voice.channel
+            else:
+                voice_channel = ctx.guild.voice_channels[0]
+                
             self.voice_client = await voice_channel.connect()
 
+        await ctx.send(args)
         audio_source = discord.FFmpegPCMAudio('music/local_music_files/MikeTest.mp3')
         if not self.voice_client.is_playing():
             self.voice_client.play(audio_source, after=lambda e: print('done', e))

@@ -1,3 +1,4 @@
 config/config.json
 music/local_music_files/secret
+music/downloaded_music_files/*
 __pycache__
