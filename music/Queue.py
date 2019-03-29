@@ -15,8 +15,8 @@ class Queue:
                 self.queue.insert(position, job)
             else:
                 return 0
-        except IndexError as e:
-            return e
+        except IndexError:
+            return
 
     def remove_queue(self, position: int):
         try:
@@ -27,14 +27,15 @@ class Queue:
             else:
                 # remove music of playing now
                 return 0
-        except IndexError as e:
-            return e
-
-    def move_queue(self, job, position: int):
-        if position==0:
+        except IndexError:
             return
-        # cannot move with IndexError
-        self.interrupt_queue(self.remove_queue(position), position)
+
+    def move_queue(self, from_position: int, to_position: int):
+        if from_position==0 or to_position==0:
+            return
+        if len(self.queue) < from_position or len(self.queue) < to_position:
+            return
+        self.interrupt_queue(self.remove_queue(from_position), to_position)
 
     def next_job(self):
         if self.queue == []:
