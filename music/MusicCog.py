@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from music.Setting import Settings
 import json
+from discord.ext.commands import CommandNotFound
 
 class MusicCog(commands.Cog):
     def __init__(self, bot):
@@ -58,7 +59,7 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def help(self, ctx):
-        setting = Setting.Settings()
+        setting = Settings()
 
         embed = discord.Embed(title='TB', description="A music bot. List of commands are:", color=0xeee657)
 
