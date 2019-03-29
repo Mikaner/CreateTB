@@ -3,7 +3,7 @@ from discord.ext import commands
 from Setting import Settings
 import json
 
-class MusicCog:
+class MusicCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.voice_client = None
