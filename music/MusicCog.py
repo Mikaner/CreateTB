@@ -2,11 +2,13 @@ import discord
 from discord.ext import commands
 from music.Setting import Settings
 from music.Download import Download
+from music.Queue import Queue
 import json
 from discord.ext.commands import CommandNotFound
 
 class MusicCog(commands.Cog):
     def __init__(self, bot):
+        self.Q = Queue()
         self.bot = bot
         self.voice_client = None
 
@@ -59,10 +61,24 @@ class MusicCog(commands.Cog):
         self.voice_client.stop()
 
     @commands.command()
-    async def remove(self, ctx):
+    async def remove(self, ctx, position):
         if self.voice_client is None:
             return
-        self.voice_client.stop()
+        if position==0:
+            self.voice_client.stop()
+        else:
+            try:
+                self.Q.remove_queue(position)
+            except IndexError:
+                await ctx.send("Out of queue.")
+
+            finally:
+                await status_queue(ctx)
+
+    @commands.command()
+    async def move(self,ctx,from_position,to_position):
+        self.Q.move_queue(from_position,to_position)
+
 
     @commands.command()
     async def disconnect(self, ctx):
@@ -81,6 +97,13 @@ class MusicCog(commands.Cog):
             embed.add_field(name=name, value=description, inline=False)
 
         await ctx.send(embed=embed)
+
+    def status_queue(self, ctx):
+        embed = discord.Embed(title='TB', description="The state of Queue:", color=0x00bfff)
+        for index, job in enumerate(self.Q.get_queue()):
+            embed.add_field(name=index, value=job, inline=False)
+
+        return ctx.send(embed=embed)
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ class Queue:
             else:
                 return 0
         except IndexError:
-            return
+            raise
 
     def remove_queue(self, position: int):
         try:
@@ -28,7 +28,7 @@ class Queue:
                 # remove music of playing now
                 return 0
         except IndexError:
-            return
+            raise
 
     def move_queue(self, from_position: int, to_position: int):
         if from_position==0 or to_position==0:
