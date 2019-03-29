@@ -5,15 +5,22 @@ from music.MusicCog import MusicCog
 import json
 import traceback
 
+INITIAL_COGS = [
+    MusicCog
+]
+
 
 class MainTB(commands.Bot):
     def __init__(self, command_prefix):
         super().__init__(command_prefix)
 
-        try:
-            self.add_cog(MusicCog(self))
-        except Exception:
-            traceback.print_exc()
+        self.remove_command('help')
+
+        for cog in INITIAL_COGS:
+            try:
+                self.add_cog(cog(self))
+            except Exception:
+                traceback.print_exc()
 
 
     async def on_ready(self):
