@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from Setting import Settings
+from .Setting import Settings
 import json
 
 class MusicCog(commands.Cog):
@@ -21,7 +21,7 @@ class MusicCog(commands.Cog):
 
         audio_source = discord.FFmpegPCMAudio('local_music_files/MikeTest.mp3')
         if not self.voice_client.is_playing():
-            self.voice_client.play(audio_source)
+            self.voice_client.play(audio_source, after=lambda e: print('done', e))
         
     @commands.command()
     async def stop(self, ctx):
