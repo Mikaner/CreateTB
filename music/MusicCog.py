@@ -41,10 +41,10 @@ class MusicCog:
         pass
 
 
-def __name__ == '__main__':
+if __name__ == '__main__':
     prefix = "$"
     bot = commands.Bot(command_prefix=prefix, description='music bot')
-    with open('../config/config.json', 'r', encoding='utf-8') as tokenCode
+    with open('../config/config.json', 'r', encoding='utf-8') as tokenCode:
         token = json.load(tokenCode)
 
     bot.add_cog(MusicCog(bot))
