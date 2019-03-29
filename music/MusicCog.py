@@ -10,12 +10,19 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def join(self, ctx):
-        pass
+        voice_channel = ctx.guild.voice_channels[0]
+        self.voice_client = await voice_channel.connect()
 
     @commands.command()
     async def play(self, ctx):
-        pass
+        if self.voice_client == None:
+            voice_channel = ctx.guild.voice_channels[0]
+            self.voice_client = await voice_channel.connect()
 
+        audio_source = discord.FFmpegPCMAudio('local_music_files/MikeTest.mp3')
+        if not self.voice_client.is_playing():
+            self.voice_client.play(audio_source)
+        
     @commands.command()
     async def stop(self, ctx):
         pass
@@ -38,14 +45,23 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def help(self, ctx):
-        pass
+        setting = Settings()
+
+        embed = discord.Embed(title='TB', description="A music bot. List of commands are:", color=0xeee657)
+
+        for name, description in setting.settings['commands']:
+            embed.add_field(name=name, value=description, inline=False)
+
+        await ctx.send(embed=embed)
 
 
 if __name__ == '__main__':
     prefix = "$"
     bot = commands.Bot(command_prefix=prefix, description='music bot')
+
     with open('../config/config.json', 'r', encoding='utf-8') as tokenCode:
         token = json.load(tokenCode)
 
+    bot.remove_command('help')
     bot.add_cog(MusicCog(bot))
     bot.run(token["token"])
