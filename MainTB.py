@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-
+from discord.ext.commands import CommandNotFound
 from music.MusicCog import MusicCog
 import json
 import traceback
@@ -28,6 +28,12 @@ class MainTB(commands.Bot):
         print(self.user.name)
         print(self.user.id)
         print('---message---')
+
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, CommandNotFound):
+            await ctx.send("No such command")
+            return
+        raise error
 
     def token(self):
         with open('./config/config.json','r',encoding='utf-8') as tokenCode:
