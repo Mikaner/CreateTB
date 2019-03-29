@@ -11,7 +11,14 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def join(self, ctx):
-        voice_channel = ctx.guild.voice_channels[0]
+
+        if self.voice_client is not None and self.voice_client.is_connected():
+            await self.voice_client.disconnect()
+
+        if ctx.author.voice.channel is not None:
+            voice_channel = ctx.author.voice.channel
+        else:
+            voice_channel = ctx.guild.voice_channels[0]
         self.voice_client = await voice_channel.connect()
 
     @commands.command()
