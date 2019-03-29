@@ -73,7 +73,7 @@ class MusicCog(commands.Cog):
                 await ctx.send("Out of queue.")
 
             finally:
-                await status_queue(ctx)
+                await self.status_queue(ctx)
 
     @commands.command()
     async def move(self,ctx,from_position,to_position):
