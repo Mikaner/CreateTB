@@ -8,5 +8,6 @@
         ["remove", "stop the audio"],
         ["disconnect", "This command will disconnect this bot"],
         ["help", "show this message"]
-    ]
+    ],
+    "download_file_ext": "mp3"
 }
