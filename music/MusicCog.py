@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from Setting import Settings
+from .Setting import Settings
 import json
 
 class MusicCog(commands.Cog):
