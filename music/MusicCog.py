@@ -17,6 +17,7 @@ class MusicCog(commands.Cog):
         self.setting = Settings()
         self.download = Download()
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
+        self.devnull = open(os.devnull, 'w')
 
     def is_url_valid(self, url):
         if url.startswith('https://www.youtube.com/watch?v='):
@@ -40,7 +41,7 @@ class MusicCog(commands.Cog):
             print("done")
             return
         try:
-            self.voice_client.play(self.Q.next_job(), after=lambda e: self.next())
+            self.voice_client.play(discord.FFmpegPCMAudio(self.Q.next_job(), stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
         except Exception:
             print('error')
 
@@ -65,6 +66,7 @@ class MusicCog(commands.Cog):
                 voice_channel = ctx.author.voice.channel
             else:
                 await ctx.send('Please join a voice channel before using $play')
+                return
 
             self.voice_client = await voice_channel.connect()
 
@@ -75,7 +77,6 @@ class MusicCog(commands.Cog):
             is_valid, service = self.is_url_valid(args[0])
             if is_valid:
                 if service == 'youtube':
-                    devnull = open(os.devnull, 'w')
                     #file_path = self.download.youtube_stream(args, self.setting.settings['download_file_ext'])
                     self.Q.add_queue(self.download.youtube_stream(args, self.setting.settings['download_file_ext']))
                 elif service == 'niconico':
@@ -89,8 +90,9 @@ class MusicCog(commands.Cog):
             pass
 
         if not self.voice_client.is_playing():
-            self.voice_client.play(discord.FFmpegPCMAudio(self.Q.next_job(), stderr=devnull, before_options=self.beforeArgs), after=lambda e: self.next())
-        
+#            self.voice_client.play(discord.FFmpegPCMAudio(self.Q.next_job(), stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
+            self.voice_client.play(discord.FFmpegPCMAudio(self.Q.next_job(), before_options=self.beforeArgs), after=lambda e: self.next())
+
     @commands.command()
     async def stop(self, ctx):
         if self.voice_client is None:
