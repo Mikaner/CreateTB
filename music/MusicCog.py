@@ -6,6 +6,7 @@ from music.Queue import Queue
 import json
 from discord.ext.commands import CommandNotFound
 import urllib.parse as urlparse
+import os
 
 
 class MusicCog(commands.Cog):
@@ -74,8 +75,9 @@ class MusicCog(commands.Cog):
             is_valid, service = self.is_url_valid(args[0])
             if is_valid:
                 if service == 'youtube':
+                    devnull = open(os.devnull, 'w')
                     file_path = self.download.youtube_stream(args, self.setting.settings['download_file_ext'])
-                    self.Q.add_queue(discord.FFmpegPCMAudio(file_path, before_options=self.beforeArgs))
+                    self.Q.add_queue(discord.FFmpegPCMAudio(file_path, stderr=devnull, before_options=self.beforeArgs))
                 elif service == 'niconico':
                     file_path = self.download.niconico_dl(args, self.setting.settings['download_file_ext'])
                     self.Q.add_queue(discord.FFmpegPCMAudio(file_path))
