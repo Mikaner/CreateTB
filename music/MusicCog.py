@@ -69,18 +69,18 @@ class MusicCog(commands.Cog):
             self.voice_client = await voice_channel.connect()
 
         if len(args) == 0:
-            self.Q.add_queue(discord.FFmpegPCMAudio('music/local_music_files/MikeTest.mp3'))
+            self.Q.add_queue('music/local_music_files/MikeTest.mp3')
         elif len(args) == 1:
             # assert args is url
             is_valid, service = self.is_url_valid(args[0])
             if is_valid:
                 if service == 'youtube':
                     devnull = open(os.devnull, 'w')
-                    file_path = self.download.youtube_stream(args, self.setting.settings['download_file_ext'])
-                    self.Q.add_queue(discord.FFmpegPCMAudio(file_path, stderr=devnull, before_options=self.beforeArgs))
+                    #file_path = self.download.youtube_stream(args, self.setting.settings['download_file_ext'])
+                    self.Q.add_queue(self.download.youtube_stream(args, self.setting.settings['download_file_ext']))
                 elif service == 'niconico':
                     file_path = self.download.niconico_dl(args, self.setting.settings['download_file_ext'])
-                    self.Q.add_queue(discord.FFmpegPCMAudio(file_path))
+                    self.Q.add_queue(file_path)
             else:
                 # assert args is search words
                 pass
@@ -89,7 +89,7 @@ class MusicCog(commands.Cog):
             pass
 
         if not self.voice_client.is_playing():
-            self.voice_client.play(self.Q.next_job(), after=lambda e: self.next())
+            self.voice_client.play(discord.FFmpegPCMAudio(self.Q.next_job(), stderr=devnull, before_options=self.beforeArgs), after=lambda e: self.next())
         
     @commands.command()
     async def stop(self, ctx):
