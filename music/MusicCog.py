@@ -69,10 +69,8 @@ class MusicCog(commands.Cog):
             is_valid, service = self.is_url_valid(args[0])
             if is_valid:
                 if service == 'youtube':
-                    file_path = self.download.youtube_dl(args, self.setting.settings['download_file_ext'])
+                    file_path = self.download.youtube_stream(args, self.setting.settings['download_file_ext'])
                     self.Q.add_queue(discord.FFmpegPCMAudio(file_path))
-
-
                 elif service == 'niconico':
                     file_path = self.download.niconico_dl(args, self.setting.settings['download_file_ext'])
                     self.Q.add_queue(discord.FFmpegPCMAudio(file_path))
