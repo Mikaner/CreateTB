@@ -6,6 +6,7 @@ from music.Queue import Queue
 import json
 from discord.ext.commands import CommandNotFound
 import urllib.parse as urlparse
+import os
 
 
 class MusicCog(commands.Cog):
@@ -15,6 +16,7 @@ class MusicCog(commands.Cog):
         self.Q = Queue()
         self.setting = Settings()
         self.download = Download()
+        self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
 
     def is_url_valid(self, url):
         if url.startswith('https://www.youtube.com/watch?v='):
@@ -33,10 +35,14 @@ class MusicCog(commands.Cog):
         return ctx.send(embed=embed)
 
     def next(self):# need to adjust
+        print('load next audio')
         if self.Q.get_queue() == []:
             print("done")
             return
-        self.voice_client.play(self.Q.next_job(), after=lambda e: self.next())
+        try:
+            self.voice_client.play(self.Q.next_job(), after=lambda e: self.next())
+        except Exception:
+            print('error')
 
     @commands.command()
     async def join(self, ctx):
@@ -69,8 +75,9 @@ class MusicCog(commands.Cog):
             is_valid, service = self.is_url_valid(args[0])
             if is_valid:
                 if service == 'youtube':
+                    devnull = open(os.devnull, 'w')
                     file_path = self.download.youtube_stream(args, self.setting.settings['download_file_ext'])
-                    self.Q.add_queue(discord.FFmpegPCMAudio(file_path))
+                    self.Q.add_queue(discord.FFmpegPCMAudio(file_path, stderr=devnull, before_options=self.beforeArgs))
                 elif service == 'niconico':
                     file_path = self.download.niconico_dl(args, self.setting.settings['download_file_ext'])
                     self.Q.add_queue(discord.FFmpegPCMAudio(file_path))
@@ -103,7 +110,6 @@ class MusicCog(commands.Cog):
         if self.voice_client is None:
             return
         self.voice_client.stop()
-        self.next()
 
     @commands.command()
     async def remove(self, ctx, position):
