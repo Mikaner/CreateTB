@@ -64,7 +64,7 @@ class MusicCog(commands.Cog):
             if is_valid:
                 if service == 'youtube':
                     download = Download()
-                    file_path = download.youtube_dl(args, self.setting.settings['download_file_ext'])
+                    file_path = download.youtube_stream(args, self.setting.settings['download_file_ext'])
                     audio_source = discord.FFmpegPCMAudio(file_path)
                 elif service == 'niconico':
                     pass
@@ -111,7 +111,7 @@ class MusicCog(commands.Cog):
                 await ctx.send("Out of queue.")
 
             finally:
-                await status_queue(ctx)
+                await self.status_queue(ctx)
 
     @commands.command()
     async def move(self,ctx,from_position,to_position):
