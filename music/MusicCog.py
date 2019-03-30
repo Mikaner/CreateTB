@@ -36,7 +36,7 @@ class MusicCog(commands.Cog):
         if self.Q.get_queue() == []:
             print("done")
             return
-        #self.voice_client.play(self.Q.next_job(), after=self.next)
+        self.voice_client.play(self.Q.next_job(), after=lambda e: self.next())
 
     @commands.command()
     async def join(self, ctx):
@@ -82,7 +82,7 @@ class MusicCog(commands.Cog):
             pass
 
         if not self.voice_client.is_playing():
-            self.voice_client.play(self.Q.next_job(), after=self.next)
+            self.voice_client.play(self.Q.next_job(), after=lambda e: self.next())
         
     @commands.command()
     async def stop(self, ctx):
@@ -103,6 +103,7 @@ class MusicCog(commands.Cog):
         if self.voice_client is None:
             return
         self.voice_client.stop()
+        self.next()
 
     @commands.command()
     async def remove(self, ctx, position):
