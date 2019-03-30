@@ -28,7 +28,7 @@ class MusicCog(commands.Cog):
         
 
     def status_queue(self, ctx):
-        embed = discord.Embed(title='TB', description="The state of Queue:", color=0x00bfff)
+        embed = discord.Embed(title='Status of Queue', description="In queue :", color=0x00bfff)
         for index, job in enumerate(self.Q.get_queue()):
             embed.add_field(name=index+1, value=job, inline=False)
 
@@ -135,6 +135,11 @@ class MusicCog(commands.Cog):
     async def queue(self,ctx):
         await self.status_queue(ctx)
 
+    @commands.command()
+    async def clear(self,ctx):
+        self.Q.queue_clear()
+        self.status_queue(ctx)
+        await ctx.send("Queue cleared!")
 
     @commands.command()
     async def disconnect(self, ctx):
@@ -152,6 +157,12 @@ class MusicCog(commands.Cog):
             embed.add_field(name=name, value=description, inline=False)
 
         await ctx.send(embed=embed)
+
+    @commands.command(name="closeTB")
+    async def close(self,ctx):
+        await ctx.close()
+        exit()
+
 
 
 
