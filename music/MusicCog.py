@@ -158,9 +158,9 @@ class MusicCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name="closeTB")
-    async def close(self,ctx):
-        await ctx.close()
+    @commands.command(name="logoutTB")
+    async def logout(self,ctx):
+        await ctx.bot.logout()
         exit()
 
 
