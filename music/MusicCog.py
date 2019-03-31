@@ -15,6 +15,8 @@ class MusicCog(commands.Cog):
         self.voice_client = None
         self.Q = Queue()
         self.setting = Settings()
+        self.now_playing = None
+        self.is_queue_looped = False
         self.download = Download()
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         self.devnull = open(os.devnull, 'w')
@@ -26,7 +28,12 @@ class MusicCog(commands.Cog):
             return (True, 'niconico')
         else:
             return (False, '')
-        
+    
+    def is_local(self, url):    
+        if url.startswith('http'):
+            return False
+        else:
+            return True
 
     def status_queue(self, ctx):
         embed = discord.Embed(title='Status of Queue', description="In queue :", color=0x00bfff)
@@ -40,10 +47,16 @@ class MusicCog(commands.Cog):
         if self.Q.get_queue() == []:
             print("done")
             return
-        try:
-            self.voice_client.play(discord.FFmpegPCMAudio(self.Q.next_job(), stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
-        except Exception:
-            print('error')
+        
+        if self.is_queue_looped:
+            self.Q.add_queue(self.now_playing)
+        
+        self.now_playing = self.Q.next_job()
+
+        if self.is_local(self.now_playing):
+            self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing), after=lambda e: self.next())
+        else:
+            self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing, stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
 
     @commands.command()
     async def join(self, ctx):
@@ -90,8 +103,23 @@ class MusicCog(commands.Cog):
             pass
 
         if not self.voice_client.is_playing():
-#            self.voice_client.play(discord.FFmpegPCMAudio(self.Q.next_job(), stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
-            self.voice_client.play(discord.FFmpegPCMAudio(self.Q.next_job(), before_options=self.beforeArgs), after=lambda e: self.next())
+            self.now_playing = self.Q.next_job()
+            if self.is_local(self.now_playing):
+                self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing), after=lambda e: self.next())
+            else:
+                self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing, stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
+
+    @commands.command()
+    async def loopqueue(self, ctx):
+        self.is_queue_looped = not self.is_queue_looped
+
+        if self.is_queue_looped:
+            await ctx.send("Enabled loopqueue")
+            return
+        else:
+            await ctx.send('Disabled loopqueue')
+            return
+
 
     @commands.command()
     async def stop(self, ctx):
@@ -140,7 +168,7 @@ class MusicCog(commands.Cog):
     @commands.command()
     async def clear(self,ctx):
         self.Q.queue_clear()
-        self.status_queue(ctx)
+        await self.status_queue(ctx)
         await ctx.send("Queue cleared!")
 
     @commands.command()
