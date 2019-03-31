@@ -35,6 +35,12 @@ class MusicCog(commands.Cog):
         else:
             return True
 
+    def show_now_playing(self, ctx):
+        embed = discord.Embed(title='Now Playing', color=0x00bfff)
+        embed.add_field(name='now playing', value=self.now_playing, inline=False)
+
+        return ctx.send(embed=embed)
+
     def status_queue(self, ctx):
         embed = discord.Embed(title='Status of Queue', description="In queue :", color=0x00bfff)
         for index, job in enumerate(self.Q.get_queue()):
@@ -120,7 +126,11 @@ class MusicCog(commands.Cog):
             await ctx.send('Disabled loopqueue')
             return
 
+    @commands.command()
+    async def nowplaying(self, ctx):
 
+        await self.show_now_playing(ctx)
+    
     @commands.command()
     async def stop(self, ctx):
         if self.voice_client is None:
@@ -163,6 +173,7 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def queue(self,ctx):
+        await self.show_now_playing(ctx)
         await self.status_queue(ctx)
 
     @commands.command()
