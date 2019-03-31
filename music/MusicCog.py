@@ -22,9 +22,12 @@ class MusicCog(commands.Cog):
         self.download = Download()
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         self.devnull = open(os.devnull, 'w')
-        self.developer_key = 'AIzaSyAt19cqHOv6O3DYpCtgRgacw-eljSgeT3w'
         self.youtube_api_service_name = 'youtube'
         self.youtube_api_version = 'v3'
+
+        with open('config/config.json', 'r', encoding='utf-8') as tokenCode:
+            token = json.load(tokenCode)
+        self.developer_key = token['APIkey']
 
     def youtube_search(self, words):
         youtube = build(self.youtube_api_service_name, self.youtube_api_version, developerKey=self.developer_key)
@@ -73,13 +76,14 @@ class MusicCog(commands.Cog):
         return ctx.send(embed=embed)
 
     def next(self):# need to adjust
-        print('load next audio')
-        if self.Q.get_queue() == []:
-            print("done")
-            return
-        
         if self.is_queue_looped:
             self.Q.add_queue(self.now_playing)
+
+        if self.Q.get_queue() == []:
+            print("done Now Queue is empty")
+            return
+        
+        print('load next audio')
         
         self.now_playing = self.Q.next_job()
 
