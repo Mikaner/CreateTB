@@ -3,9 +3,14 @@ from youtube_dl.utils import DownloadError
 import urllib.parse as urlparse
 import os
 import pafy
+import concurrent.futures
 
 
 class Download:
+    def __init__(self):
+        self.executor = concurrent.futures.ProcessPoolExecutor(max_workers=2)
+
+
     def youtube_dl(self, youtube_url, ext):
         url = youtube_url[0]
         parsed = urlparse.urlparse(url)
@@ -27,6 +32,7 @@ class Download:
         return file_path
 
     def niconico_dl(self, niconico_url, ext):
+        executor = concurrent.futures.ProcessPoolExecutor(max_workers=2)
         url = niconico_url[0]
         parsed = urlparse.urlparse(url)
         file_path = 'music/downloaded_music_files/niconico/' + os.path.basename(parsed.path) + '.' + ext
@@ -52,7 +58,7 @@ class Download:
                 'usenetrc': True
             }
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                ydl.download(niconico_url)
+                self.executor.submit(ydl.download(niconico_url))
             
         return file_path
 

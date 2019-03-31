@@ -22,15 +22,16 @@ class MusicCog(commands.Cog):
         self.download = Download()
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         self.devnull = open(os.devnull, 'w')
-        self.youtube_api_service_name = 'youtube'
-        self.youtube_api_version = 'v3'
+
+
+    def youtube_search(self, words):
+        youtube_api_service_name = 'youtube'
+        youtube_api_version = 'v3'
 
         with open('config/config.json', 'r', encoding='utf-8') as tokenCode:
             token = json.load(tokenCode)
-        self.developer_key = token['APIkey']
-
-    def youtube_search(self, words):
-        youtube = build(self.youtube_api_service_name, self.youtube_api_version, developerKey=self.developer_key)
+        developer_key = token['APIkey']
+        youtube = build(youtube_api_service_name, youtube_api_version, developerKey=developer_key)
 
         search_response = youtube.search().list(
             q=words,
