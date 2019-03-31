@@ -7,6 +7,8 @@ import json
 from discord.ext.commands import CommandNotFound
 import urllib.parse as urlparse
 import os
+from apiclient.discovery import build
+from apiclient.errors import HttpError
 
 
 class MusicCog(commands.Cog):
@@ -20,7 +22,29 @@ class MusicCog(commands.Cog):
         self.download = Download()
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         self.devnull = open(os.devnull, 'w')
+        self.developer_key = 'AIzaSyAt19cqHOv6O3DYpCtgRgacw-eljSgeT3w'
+        self.youtube_api_service_name = 'youtube'
+        self.youtube_api_version = 'v3'
 
+    def youtube_search(self, words):
+        youtube = build(self.youtube_api_service_name, self.youtube_api_version, developerKey=self.developer_key)
+
+        search_response = youtube.search().list(
+            q=words,
+            part="id,snippet"
+        ).execute()
+
+        videos = []
+
+        for search_result in search_response.get("items", []):
+            if search_result['id']['kind'] == 'youtube#video':
+                videos.append(search_result['id']['videoId'])
+
+        url = 'https://www.youtube.com/watch?v=' + videos[0]
+
+        return url
+
+        
     def is_url_valid(self, url):
         if url.startswith('https://www.youtube.com/watch?v='):
             return (True, 'youtube')
@@ -103,10 +127,24 @@ class MusicCog(commands.Cog):
                     self.Q.add_queue(file_path)
             else:
                 # assert args is search words
-                pass
+                try:
+                    url = self.youtube_search(" ".join(args))
+                    await ctx.send(url)
+                except HttpError:
+                    await ctx.send("Http Error occured")
+                    return
+                    
+                self.Q.add_queue(self.download.youtube_stream([url], self.setting.settings['download_file_ext']))
         else:
             # assert args is search words
-            pass
+            try:
+                url = self.youtube_search(" ".join(args))
+                await ctx.send(url)
+            except HttpError:
+                await ctx.send("Http Error occured")
+                return
+
+            self.Q.add_queue(self.download.youtube_stream([self.youtube_search(" ".join(args))], self.setting.settings['download_file_ext']))
 
         if not self.voice_client.is_playing():
             self.now_playing = self.Q.next_job()
