@@ -24,29 +24,6 @@ class MusicCog(commands.Cog):
         self.devnull = open(os.devnull, 'w')
 
 
-    def youtube_search(self, words):
-        youtube_api_service_name = 'youtube'
-        youtube_api_version = 'v3'
-
-        with open('config/config.json', 'r', encoding='utf-8') as tokenCode:
-            config = json.load(tokenCode)
-        developer_key = config['APIkey']
-        youtube = build(youtube_api_service_name, youtube_api_version, developerKey=developer_key)
-
-        search_response = youtube.search().list(
-            q=words,
-            part="id,snippet"
-        ).execute()
-
-        videos = []
-
-        for search_result in search_response.get("items", []):
-            if search_result['id']['kind'] == 'youtube#video':
-                videos.append(search_result['id']['videoId'])
-
-        url = 'https://www.youtube.com/watch?v=' + videos[0]
-
-        return url
 
         
     def is_url_valid(self, url):
@@ -135,7 +112,7 @@ class MusicCog(commands.Cog):
             else:
                 # assert args is search words
                 try:
-                    url = self.youtube_search(" ".join(args))
+                    url = self.download.youtube_search(" ".join(args))
                     await ctx.send(url)
                 except HttpError:
                     await ctx.send("Http Error occured")
