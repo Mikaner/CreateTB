@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
+from Config import Config
 from music.MusicCog import MusicCog
-import json
 import traceback
 
 INITIAL_COGS = [
@@ -13,9 +13,6 @@ INITIAL_COGS = [
 class MainTB(commands.Bot):
     def __init__(self, command_prefix):
         super().__init__(command_prefix)
-
-        with open('./config/config.json','r',encoding='utf-8') as tokenCode:
-            self.config = json.load(tokenCode)
 
         self.remove_command('help')
 
@@ -38,15 +35,9 @@ class MainTB(commands.Bot):
             return
         raise error
 
-    def token(self):
-        return self.config["token"]
-        
-        
-
 
 
 if __name__ == "__main__":
-    with open('./config/config.json','r',encoding='utf-8') as tokenCode:
-        config = json.load(tokenCode)
-    TB = MainTB(command_prefix=config["prefix"])
-    TB.run(TB.token())
+    config = Config()
+    TB = MainTB(command_prefix=config.get_prefix())
+    TB.run(config.get_token())

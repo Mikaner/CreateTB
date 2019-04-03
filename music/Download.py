@@ -3,15 +3,15 @@ from youtube_dl.utils import DownloadError
 import urllib.parse as urlparse
 import os
 import pafy
-import json
 import concurrent.futures
+from Config import Config
 from apiclient.discovery import build
-from apiclient.errors import HttpError
 
 
 class Download:
     def __init__(self):
         self.executor = concurrent.futures.ProcessPoolExecutor(max_workers=2)
+        self.config = Config()
 
 
     def youtube_dl(self, youtube_url, ext):
@@ -63,23 +63,24 @@ class Download:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 self.executor.submit(ydl.download(niconico_url))
             
-        return file_path
+        return {"url":file_path, "title":None, "thumbnail":None, "author":None}
 
     def youtube_stream(self, youtube_url, ext):
         url = youtube_url[0]
         video = pafy.new(url)
+        title = video.title
+        thumbnail = video.thumb
+        author = video.author
         best = video.getbestaudio()
         playurl = best.url
 
-        return playurl
+        return {"url":playurl, "title":title, "thumbnail":thumbnail, "author":author}
 
     def youtube_search(self, words):
         youtube_api_service_name = 'youtube'
         youtube_api_version = 'v3'
 
-        with open('config/config.json', 'r', encoding='utf-8') as tokenCode:
-            config = json.load(tokenCode)
-        developer_key = config['APIkey']
+        developer_key = self.config.get_API_key()
         youtube = build(youtube_api_service_name, youtube_api_version, developerKey=developer_key)
 
         search_response = youtube.search().list(
