@@ -5,10 +5,7 @@ from music.Download import Download
 from music.Queue import Queue
 import json
 from discord.ext.commands import CommandNotFound
-import urllib.parse as urlparse
 import os
-from apiclient.discovery import build
-from apiclient.errors import HttpError
 
 
 class MusicCog(commands.Cog):
@@ -24,8 +21,6 @@ class MusicCog(commands.Cog):
         self.devnull = open(os.devnull, 'w')
 
 
-
-        
     def is_url_valid(self, url):
         if url.startswith('https://www.youtube.com/watch?v='):
             return (True, 'youtube')
@@ -33,7 +28,7 @@ class MusicCog(commands.Cog):
             return (True, 'niconico')
         else:
             return (False, '')
-    
+
     def is_local(self, url):    
         if url.startswith('http'):
             return False
@@ -75,22 +70,22 @@ class MusicCog(commands.Cog):
         if self.voice_client is not None and self.voice_client.is_connected():
             await self.voice_client.disconnect()
 
-        if ctx.author.voice is not None:
-            voice_channel = ctx.author.voice.channel
-        else:
-            await ctx.send(embed=discord.Embed(title='Join a voice channel before $join', colour=0x00bfff))
+        if ctx.author.voice is None:
+            await ctx.send(embed=discord.Embed(title='Please join a voice channel before $join', colour=0x00bfff))
             return
+
+        voice_channel = ctx.author.voice.channel
 
         self.voice_client = await voice_channel.connect()
 
-        await ctx.send(embed=discord.Embed(title="Hello:hand_splayed:", colour=0x00bfff))
+        await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client.channel} ! :thumbsup:", colour=0x00bfff))
 
     @commands.command()
     async def play(self, ctx, *args):
         if self.voice_client is None:
             if ctx.author.voice is not None:
                 voice_channel = ctx.author.voice.channel
-                await ctx.send('Hello:hand_splayed:')
+                await ctx.send(f"Successfuly connected to {self.voice_client.channel} ! :thumbsup:")
             else:
                 await ctx.send('Please join a voice channel before using $play')
                 return
