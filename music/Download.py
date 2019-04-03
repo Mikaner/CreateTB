@@ -69,6 +69,31 @@ class Download:
         playurl = best.url
 
         return playurl
+
+    def youtube_search(self, words):
+        youtube_api_service_name = 'youtube'
+        youtube_api_version = 'v3'
+
+        with open('config/config.json', 'r', encoding='utf-8') as tokenCode:
+            config = json.load(tokenCode)
+        developer_key = config['APIkey']
+        youtube = build(youtube_api_service_name, youtube_api_version, developerKey=developer_key)
+
+        search_response = youtube.search().list(
+            q=words,
+            part="id,snippet"
+        ).execute()
+
+        videos = []
+
+        for search_result in search_response.get("items", []):
+            if search_result['id']['kind'] == 'youtube#video':
+                videos.append(search_result['id']['videoId'])
+
+        url = 'https://www.youtube.com/watch?v=' + videos[0]
+
+        return url
+
       
 
 if __name__ == '__main__':
