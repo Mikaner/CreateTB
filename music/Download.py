@@ -3,7 +3,10 @@ from youtube_dl.utils import DownloadError
 import urllib.parse as urlparse
 import os
 import pafy
+import json
 import concurrent.futures
+from apiclient.discovery import build
+from apiclient.errors import HttpError
 
 
 class Download:
