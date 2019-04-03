@@ -37,8 +37,8 @@ class MainTB(commands.Bot):
 
     def token(self):
         with open('./config/config.json','r',encoding='utf-8') as tokenCode:
-            self.tokens = json.load(tokenCode)
-        return self.tokens["token"]
+            self.config = json.load(tokenCode)
+        return self.config["token"]
 
 
 

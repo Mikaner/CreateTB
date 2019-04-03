@@ -29,8 +29,8 @@ class MusicCog(commands.Cog):
         youtube_api_version = 'v3'
 
         with open('config/config.json', 'r', encoding='utf-8') as tokenCode:
-            token = json.load(tokenCode)
-        developer_key = token['APIkey']
+            config = json.load(tokenCode)
+        developer_key = config['APIkey']
         youtube = build(youtube_api_service_name, youtube_api_version, developerKey=developer_key)
 
         search_response = youtube.search().list(
