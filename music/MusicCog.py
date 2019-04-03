@@ -6,6 +6,7 @@ from music.Queue import Queue
 import json
 from discord.ext.commands import CommandNotFound
 import os
+from apiclient.errors import HttpError
 
 
 class MusicCog(commands.Cog):
