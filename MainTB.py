@@ -14,6 +14,9 @@ class MainTB(commands.Bot):
     def __init__(self, command_prefix):
         super().__init__(command_prefix)
 
+        with open('./config/config.json','r',encoding='utf-8') as tokenCode:
+            self.config = json.load(tokenCode)
+
         self.remove_command('help')
 
         for cog in INITIAL_COGS:
@@ -36,14 +39,14 @@ class MainTB(commands.Bot):
         raise error
 
     def token(self):
-        with open('./config/config.json','r',encoding='utf-8') as tokenCode:
-            self.config = json.load(tokenCode)
         return self.config["token"]
+        
+        
 
 
 
 if __name__ == "__main__":
-    prefix = "$"
-
-    TB = MainTB(command_prefix=prefix)
+    with open('./config/config.json','r',encoding='utf-8') as tokenCode:
+        config = json.load(tokenCode)
+    TB = MainTB(command_prefix=config["prefix"])
     TB.run(TB.token())
