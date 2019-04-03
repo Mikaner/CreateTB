@@ -44,7 +44,7 @@ class MusicCog(commands.Cog):
     def status_queue(self, ctx):
         embed = discord.Embed(title='Status of Queue', description="In queue :", color=0x00bfff)
         for index, job in enumerate(self.Q.get_queue()):
-            embed.add_field(name=index+1+job["title"], value=job["author"], inline=True)
+            embed.add_field(name=str(index+1)+" : "+job["title"], value=job["author"], inline=True)
 
         return ctx.send(embed=embed)
 
