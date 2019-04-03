@@ -64,8 +64,7 @@ class MusicCog(commands.Cog):
             return True
 
     def show_now_playing(self, ctx):
-        embed = discord.Embed(title='Now Playing', color=0x00bfff)
-        embed.add_field(name='now playing', value=self.now_playing, inline=False)
+        embed = discord.Embed(title='Now Playing', description=self.now_playing, color=0x00bfff)
 
         return ctx.send(embed=embed)
 
@@ -102,16 +101,19 @@ class MusicCog(commands.Cog):
         if ctx.author.voice is not None:
             voice_channel = ctx.author.voice.channel
         else:
-            await ctx.send('Please join a voice channel before using $join')
+            await ctx.send(embed=discord.Embed(title='Join a voice channel before $join', colour=0x00bfff))
             return
 
         self.voice_client = await voice_channel.connect()
+
+        await ctx.send(embed=discord.Embed(title="Hello:hand_splayed:", colour=0x00bfff))
 
     @commands.command()
     async def play(self, ctx, *args):
         if self.voice_client is None:
             if ctx.author.voice is not None:
                 voice_channel = ctx.author.voice.channel
+                await ctx.send('Hello:hand_splayed:')
             else:
                 await ctx.send('Please join a voice channel before using $play')
                 return
@@ -163,11 +165,11 @@ class MusicCog(commands.Cog):
         self.is_queue_looped = not self.is_queue_looped
 
         if self.is_queue_looped:
-            await ctx.send("Enabled loopqueue")
-            return
+            embed = discord.Embed(title='Enabled loopqueue', colour=0x47ea7e)
         else:
-            await ctx.send('Disabled loopqueue')
-            return
+            embed = discord.Embed(title='Disabled loopqueue', colour=0xff0000)
+
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def nowplaying(self, ctx):
@@ -180,6 +182,8 @@ class MusicCog(commands.Cog):
             return
         if self.voice_client.is_playing():
             self.voice_client.pause()
+            await ctx.send(embed=discord.Embed(title="Paused", colour=0x47ea7a))
+
 
     @commands.command()
     async def start(self, ctx):
@@ -187,12 +191,14 @@ class MusicCog(commands.Cog):
             return
         if self.voice_client.is_paused():
             self.voice_client.resume()
+            await ctx.send(embed=discord.Embed(title="Resumed", colour=0x47ea7a))
 
     @commands.command()
     async def skip(self, ctx):
         if self.voice_client is None:
             return
         self.voice_client.stop()
+        await ctx.send(embed=discord.Embed(title='Skipped', colour=0x47ea7a))
 
     @commands.command()
     async def remove(self, ctx, position):
@@ -200,11 +206,13 @@ class MusicCog(commands.Cog):
             return
         if int(position)==0:
             self.voice_client.stop()
+            await ctx.send(embed=discord.Embed(title='Stopped', colour=0x47ea7a))
         else:
             try:
                 self.Q.remove_queue(int(position))
+                await ctx.send(embed=discord.Embed(title='Removed the Music', colour=0x47ea7a))
             except IndexError:
-                await ctx.send("Out of queue.")
+                await ctx.send(embed=discord.Embed(title="Out of queue.", colour=0xff0000))
 
             finally:
                 await self.status_queue(ctx)
@@ -212,6 +220,7 @@ class MusicCog(commands.Cog):
     @commands.command()
     async def move(self,ctx,from_position,to_position):
         self.Q.move_queue(int(from_position),int(to_position))
+        await ctx.send(embed=discord.Embed(title='Moved ' + from_position + ' to ' + to_position))
         await self.status_queue(ctx)
 
     @commands.command()
@@ -223,7 +232,7 @@ class MusicCog(commands.Cog):
     async def clear(self,ctx):
         self.Q.queue_clear()
         await self.status_queue(ctx)
-        await ctx.send("Queue cleared!")
+        await ctx.send(embed=discord.Embed(title="Queue cleared!", colour=0x47ea7a))
 
     @commands.command()
     async def disconnect(self, ctx):
