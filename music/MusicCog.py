@@ -188,7 +188,7 @@ class MusicCog(commands.Cog):
     async def skip(self, ctx):
         if self.voice_client is None:
             return
-        await ctx.send(embed=discord.Embed(title=self.now_playing["title"]+'was skipped', colour=0x47ea7a))
+        await ctx.send(embed=discord.Embed(title=self.now_playing["title"]+' was skipped', colour=0x47ea7a))
         self.voice_client.stop()
 
     @commands.command()
@@ -196,23 +196,24 @@ class MusicCog(commands.Cog):
         if self.voice_client is None:
             return
         if int(position)==0:
+            await ctx.send(embed=discord.Embed(title=self.now_playing["title"]+' was skipeed', colour=0x47ea7a))
             self.voice_client.stop()
-            await ctx.send(embed=discord.Embed(title='Stopped', colour=0x47ea7a))
-        else:
-            try:
-                self.Q.remove_queue(int(position))
-                await ctx.send(embed=discord.Embed(title='Removed the Music', colour=0x47ea7a))
-            except IndexError:
-                await ctx.send(embed=discord.Embed(title="Out of queue.", colour=0xff0000))
+            return
 
-            finally:
-                await self.show_now_playing(ctx)
-                await self.status_queue(ctx)
+        try:
+            await ctx.send(embed=discord.Embed(title='Removed the '+self.Q.get_queue()[int(position)]["title"], colour=0x47ea7a))
+            self.Q.remove_queue(int(position))
+        except IndexError:
+            await ctx.send(embed=discord.Embed(title="Out of queue.", colour=0xff0000))
+
+        finally:
+            await self.show_now_playing(ctx)
+            await self.status_queue(ctx)
 
     @commands.command()
     async def move(self,ctx,from_position,to_position):
         self.Q.move_queue(int(from_position),int(to_position))
-        await ctx.send(embed=discord.Embed(title='Moved ' + from_position + ' to ' + to_position, colour=0x47ea7a))
+        await ctx.send(embed=discord.Embed(title='Moved ' + self.Q.get_queue()[int(to_position)]["title"] + ' to ' + to_position, colour=0x47ea7a))
         await self.status_queue(ctx)
 
     @commands.command()
