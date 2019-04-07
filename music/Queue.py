@@ -39,7 +39,7 @@ class Queue:
 
     def next_job(self):
         if self.queue == []:
-            return
+            return None
         return self.queue.pop(0)
 
     def get_queue(self):

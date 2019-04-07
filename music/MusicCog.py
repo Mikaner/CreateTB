@@ -29,7 +29,7 @@ class MusicCog(commands.Cog):
         else:
             return (False, '')
 
-    def is_local(self, url):    
+    def is_local(self, url):
         if url.startswith('http'):
             return False
         else:
@@ -201,7 +201,7 @@ class MusicCog(commands.Cog):
             return
 
         try:
-            await ctx.send(embed=discord.Embed(title='Removed the '+self.Q.get_queue()[int(position)]["title"], colour=0x47ea7a))
+            await ctx.send(embed=discord.Embed(title='Removed the '+self.Q.get_queue()[int(position)-1]["title"], colour=0x47ea7a))
             self.Q.remove_queue(int(position))
         except IndexError:
             await ctx.send(embed=discord.Embed(title="Out of queue.", colour=0xff0000))
