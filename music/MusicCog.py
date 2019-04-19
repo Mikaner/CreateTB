@@ -6,6 +6,7 @@ from music.Queue import Queue
 from discord.ext.commands import CommandNotFound
 import os
 from apiclient.errors import HttpError
+from pathlib import Path
 
 
 class MusicCog(commands.Cog):
@@ -19,13 +20,20 @@ class MusicCog(commands.Cog):
         self.download = Download()
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         self.devnull = open(os.devnull, 'w')
+        # Pathを使ってみたいということで編集中
+        # SQLインジェクション攻撃はlist指定型で防ごうと思います。
+        self.local = Path("./music/local_music_file/")
 
 
     def is_url_valid(self, url):
+        music_file = re.compile(u'-l (.+)').search(url)
         if url.startswith('https://www.youtube.com/watch?v='):
             return (True, 'youtube')
         elif url.startswith('https://www.nicovideo.jp/watch/sm'):
             return (True, 'niconico')
+        elif music_file:
+            # SQLインジェクション攻撃が有効っぽそうなのでとりあえずFalseにしてます
+            return (False, 'local', music_file.group(1))
         else:
             return (False, '')
 
@@ -80,18 +88,21 @@ class MusicCog(commands.Cog):
         await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client.channel} ! :thumbsup:", colour=0x00bfff))
 
     @commands.command()
-    async def show_local_file(self, ctx, *args):
+    async def show_local_file(self, ctx):
+        """
         try:
             page = int(args[0])
         except TypeError:
             await ctx.send("TypeError")
+        """
         embed = discord.Embed(title="My local files")
         for filePATH,fileDirectry,files in os.walk("music/local_music_files/secret"):
             try:
-                for i in range(page):
+                # ここのtry文は今意味ない
+                for i in range(len(files)):
                     embed.add_field(name=files[i],value=filePATH)
             except IndexError:
-                await ctx.send("IndexError")
+                await ctx.send("OutOfPage")
                 return
         await ctx.send(embed=embed)
 
@@ -116,7 +127,11 @@ class MusicCog(commands.Cog):
                     self.Q.add_queue(self.download.youtube_stream(args, self.setting.settings['download_file_ext']))
                 elif service == 'niconico':
                     self.Q.add_queue(self.download.niconico_dl(args, self.setting.settings['download_file_ext']))
-                    
+
+                # play local file
+                # SQLインジェクション攻撃対策はまだ
+                elif service == 'local':
+                    self.Q.add_queue({"url":'music/local_music_files/secret/'+service,"title":service, "thumbnail":None, "author":"Cannot read, please wait."})
             else:
                 # assert args is search words
                 try:
