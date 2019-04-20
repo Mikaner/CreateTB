@@ -229,9 +229,13 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def move(self,ctx,from_position,to_position):
-        self.Q.move_queue(int(from_position),int(to_position))
-        await ctx.send(embed=discord.Embed(title='Moved ' + self.Q.get_queue()[int(to_position)]["title"] + ' to ' + to_position, colour=0x47ea7a))
-        await self.status_queue(ctx)
+        try:
+            await ctx.send(embed=discord.Embed(title='Moved ' + self.Q.get_queue()[int(from_position)]["title"] + ' to ' + to_position, colour=0x47ea7a))
+            self.Q.move_queue(int(from_position),int(to_position))
+        except IndexError:
+            await ctx.send(embed=discord.Embed(title="Out of queue", colour=0xff0000))
+        finally:
+            await self.status_queue(ctx)
 
     @commands.command()
     async def queue(self,ctx):
