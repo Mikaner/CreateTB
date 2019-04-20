@@ -27,7 +27,7 @@ class MainTB(commands.Bot):
         print('Logged in as')
         print(self.user.name)
         print(self.user.id)
-        print('---message---')
+        print('message'.center(15, '-'))
 
     async def on_command_error(self, ctx, error):
         if isinstance(error, CommandNotFound):

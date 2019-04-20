@@ -7,6 +7,7 @@ from discord.ext.commands import CommandNotFound
 import os
 from apiclient.errors import HttpError
 from pathlib import Path
+import re
 
 
 class MusicCog(commands.Cog):
@@ -26,6 +27,7 @@ class MusicCog(commands.Cog):
 
 
     def is_url_valid(self, url):
+        # もしかしてここargs[2]で取得できる？
         music_file = re.compile(u'-l (.+)').search(url)
         if url.startswith('https://www.youtube.com/watch?v='):
             return (True, 'youtube')
