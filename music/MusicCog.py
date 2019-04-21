@@ -22,20 +22,15 @@ class MusicCog(commands.Cog):
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         self.devnull = open(os.devnull, 'w')
         # Pathを使ってみたいということで編集中
-        # SQLインジェクション攻撃はlist指定型で防ごうと思います。
+        # ディレクトリトラバーサルはlist指定型で防ごうと思います。
         self.local = Path("./music/local_music_file/")
 
 
     def is_url_valid(self, url):
-        # もしかしてここargs[2]で取得できる？
-        music_file = re.compile(u'-l (.+)').search(url)
         if url.startswith('https://www.youtube.com/watch?v='):
             return (True, 'youtube')
         elif url.startswith('https://www.nicovideo.jp/watch/sm'):
             return (True, 'niconico')
-        elif music_file:
-            # SQLインジェクション攻撃が有効っぽそうなのでとりあえずFalseにしてます
-            return (False, 'local', music_file.group(1))
         else:
             return (False, '')
 
@@ -120,8 +115,11 @@ class MusicCog(commands.Cog):
             await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client.channel} ! :thumbsup:", colour=0x00bfff))
 
         if len(args) == 0:
-            self.Q.add_queue({"url":'music/local_music_files/MikeTest.mp3',"title":"MikeTest.mp3","thumbnail":None,"author":"Mikaner"})
+            print("test")
+            self.Q.add_queue({"url":'./music/local_music_files/MikeTest.mp3',"title":"MikeTest.mp3","thumbnail":None,"author":"Mikaner"})
+
         elif len(args) == 1:
+            print("1",args)
             # assert args is url
             is_valid, service = self.is_url_valid(args[0])
             if is_valid:
@@ -130,12 +128,9 @@ class MusicCog(commands.Cog):
                 elif service == 'niconico':
                     self.Q.add_queue(self.download.niconico_dl(args, self.setting.settings['download_file_ext']))
 
-                # play local file
-                # SQLインジェクション攻撃対策はまだ
-                elif service == 'local':
-                    self.Q.add_queue({"url":'music/local_music_files/secret/'+service,"title":service, "thumbnail":None, "author":"Cannot read, please wait."})
             else:
                 # assert args is search words
+                print("search1 ", type(args))
                 try:
                     url = self.download.youtube_search(" ".join(args))
                     await ctx.send(url)
@@ -144,7 +139,15 @@ class MusicCog(commands.Cog):
                     return
                     
                 self.Q.add_queue(self.download.youtube_stream([url], self.setting.settings['download_file_ext']))
+
+        # play local file
+        elif args[0] == '-l':
+            print("play local",args)
+            file_name = " ".join(args[1::])
+            self.Q.add_queue({"url":'./music/local_music_files/secret/'+file_name,"title":file_name[:len(file_name)-4:], "thumbnail":None, "author":"Cannot read, please wait."})
+
         else:
+            print("search2 ",args)
             # assert args is search words
             try:
                 url = self.download.youtube_search(" ".join(args))
@@ -165,6 +168,7 @@ class MusicCog(commands.Cog):
         if not self.voice_client.is_playing():
             self.now_playing = self.Q.next_job()
             if self.is_local(self.now_playing["url"]):
+                # ここがダメ
                 self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing["url"]), after=lambda e: self.next())
             else:
                 self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing["url"], stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
