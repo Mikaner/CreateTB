@@ -34,6 +34,7 @@ class Queue:
         if from_position==0 or to_position==0:
             return
         if len(self.queue) < from_position or len(self.queue) < to_position:
+            raise IndexError
             return
         self.interrupt_queue(self.remove_queue(from_position), to_position)
 
