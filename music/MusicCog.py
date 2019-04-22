@@ -22,8 +22,10 @@ class MusicCog(commands.Cog):
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         self.devnull = open(os.devnull, 'w')
         # Pathを使ってみたいということで編集中
-        # ディレクトリトラバーサルはlist指定型で防ごうと思います。
+        # ディレクトリトラバーサルはlist指定型で防ごうと思います。→検索でいんじゃね？
         self.local = Path("./music/local_music_file/")
+        # thumbnailを使うとは言っていない
+        self.local_thumbnail = "./music/local_music_file/thumbnail.png"
 
 
     def is_url_valid(self, url):
@@ -42,7 +44,8 @@ class MusicCog(commands.Cog):
 
     def show_now_playing(self, ctx):
         embed = discord.Embed(title='Now Playing', description=self.now_playing["title"], color=0x00bfff)
-        embed.set_thumbnail(url=self.now_playing["thumbnail"])
+        if self.now_playing["thumbnail"] is not None:
+            embed.set_thumbnail(url=self.now_playing["thumbnail"])
 
         return ctx.send(embed=embed)
 
@@ -85,22 +88,21 @@ class MusicCog(commands.Cog):
         await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client.channel} ! :thumbsup:", colour=0x00bfff))
 
     @commands.command()
-    async def show_local_file(self, ctx):
-        """
+    async def show_local_file(self, ctx, *args):
         try:
-            page = int(args[0])
+            page = int(args[0])-1 if len(args) != 0 else 0
         except TypeError:
             await ctx.send("TypeError")
-        """
         embed = discord.Embed(title="My local files")
         for filePATH,fileDirectry,files in os.walk("music/local_music_files/secret"):
-            try:
-                # ここのtry文は今意味ない
-                for i in range(len(files)):
+            # Page processing
+            if -1 < page <= (len(files)//20):
+                for i in range(page*20, (page+1)*20 if len(files) > (page+1)*20 else len(files)):
                     embed.add_field(name=files[i],value=filePATH)
-            except IndexError:
-                await ctx.send("OutOfPage")
+            else:
+                await ctx.send(embed=discord.Embed(title="OutOfPage", colour=0xff0000))
                 return
+
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -130,7 +132,7 @@ class MusicCog(commands.Cog):
 
             else:
                 # assert args is search words
-                print("search1 ", type(args))
+                print("search1 ", args)
                 try:
                     url = self.download.youtube_search(" ".join(args))
                     await ctx.send(url)
@@ -140,8 +142,8 @@ class MusicCog(commands.Cog):
                     
                 self.Q.add_queue(self.download.youtube_stream([url], self.setting.settings['download_file_ext']))
 
-        # play local file
         elif args[0] == '-l':
+            # play local file
             print("play local",args)
             file_name = " ".join(args[1::])
             self.Q.add_queue({"url":'./music/local_music_files/secret/'+file_name,"title":file_name[:len(file_name)-4:], "thumbnail":None, "author":"Cannot read, please wait."})
@@ -160,7 +162,8 @@ class MusicCog(commands.Cog):
 
         add = self.Q.get_queue()[-1]
         embed = discord.Embed(title="Added to queue !",description=add["title"], colour=0x00bfff)
-        embed.set_thumbnail(url=add["thumbnail"])
+        if add["thumbnail"] is not None:
+            embed.set_thumbnail(url=add["thumbnail"])
         embed.set_author(name=add["author"])
         await ctx.send(embed=embed)
 
@@ -168,7 +171,6 @@ class MusicCog(commands.Cog):
         if not self.voice_client.is_playing():
             self.now_playing = self.Q.next_job()
             if self.is_local(self.now_playing["url"]):
-                # ここがダメ
                 self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing["url"]), after=lambda e: self.next())
             else:
                 self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing["url"], stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
@@ -216,14 +218,19 @@ class MusicCog(commands.Cog):
     async def remove(self, ctx, position):
         if self.voice_client is None:
             return
-        if int(position)==0:
-            await ctx.send(embed=discord.Embed(title=self.now_playing["title"]+' was skipeed', colour=0x47ea7a))
-            self.voice_client.stop()
+        try:
+            if int(position)==0:
+                await ctx.send(embed=discord.Embed(title=self.now_playing["title"]+' was skipeed', colour=0x47ea7a))
+                self.voice_client.stop()
+                return
+            position = self.Q.convert_value(int(position))
+        except TypeError:
+            await ctx.send(embed=discord.Embed(title="Type Error",description="Please type integer", colour=0xff0000))
             return
 
         try:
-            await ctx.send(embed=discord.Embed(title='Removed the '+self.Q.get_queue()[int(position)-1]["title"], colour=0x47ea7a))
-            self.Q.remove_queue(int(position))
+            await ctx.send(embed=discord.Embed(title='Removed the '+self.Q.remove_queue(int(position))["title"], colour=0x47ea7a))
+
         except IndexError:
             await ctx.send(embed=discord.Embed(title="Out of queue.", colour=0xff0000))
 
@@ -234,8 +241,17 @@ class MusicCog(commands.Cog):
     @commands.command()
     async def move(self,ctx,from_position,to_position):
         try:
-            await ctx.send(embed=discord.Embed(title='Moved ' + self.Q.get_queue()[int(from_position)]["title"] + ' to ' + to_position, colour=0x47ea7a))
-            self.Q.move_queue(int(from_position),int(to_position))
+            if int(from_position)==0 or int(to_position)==0:
+                await self.ctx.send(embed=discord.Embed(title="Out of queue.", colour=0xff0000))
+                return
+            from_position, to_position = self.Q.convert_value(int(from_position)), self.Q.convert_value(int(to_position))
+        except TypeError:
+            await ctx.send(embed=discord.Embed(title="Type Error",description="Please type integer", colour=0xff0000))
+            return
+
+        try:
+            await ctx.send(embed=discord.Embed(title='Moved ' + self.Q.get_queue()[int(from_position)]["title"] + ' to ' + str(to_position if to_position < 0 else to_position+1), colour=0x47ea7a))
+            self.Q.move_queue(int(from_position), int(to_position))
         except IndexError:
             await ctx.send(embed=discord.Embed(title="Out of queue", colour=0xff0000))
         finally:

@@ -4,35 +4,25 @@ class Queue:
     def __init__(self):
         self.queue = list()
 
+    def convert_value(self, position: int):
+        return position if position < 1 else position-1
+
     def add_queue(self, job):
         self.queue.append(job)
 
     def interrupt_queue(self, job, position: int):
         try:
-            if position > 0:
-                self.queue.insert(position-1, job)
-            elif position < 0:
-                self.queue.insert(position, job)
-            else:
-                return 0
+            self.queue.insert(position, job)
         except IndexError:
             raise
 
     def remove_queue(self, position: int):
         try:
-            if position > 0:
-                return self.queue.pop(position-1)
-            elif position < 0:
-                return self.queue.pop(position)
-            else:
-                # remove music of playing now
-                return 0
+            return self.queue.pop(position)
         except IndexError:
             raise
 
     def move_queue(self, from_position: int, to_position: int):
-        if from_position==0 or to_position==0:
-            return
         if len(self.queue) < from_position or len(self.queue) < to_position:
             raise IndexError
             return
