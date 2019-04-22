@@ -12,7 +12,12 @@ class Queue:
 
     def interrupt_queue(self, job, position: int):
         try:
-            self.queue.insert(position, job)
+            if position >= 0:
+                self.queue.insert(position, job)
+            elif position == -1:
+                self.queue.append(job)
+            else:
+                self.queue.insert(position+1)
         except IndexError:
             raise
 
