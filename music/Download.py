@@ -58,10 +58,14 @@ class Download:
                 'no_warnings': True,
                 'default_search': 'auto',
                 'source_address': '0.0.0.0',
-                'usenetrc': True
+                'usenetrc': True,
             }
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                self.executor.submit(ydl.download(niconico_url))
+                #self.executor.submit(ydl.download(niconico_url))
+                info_dict = ydl.extract_info(niconico_url[0], download=False)
+                print(info_dict)
+                file_path = info_dict.get('url', None)
+                print(file_path)
             
         return {"url":file_path, "title":None, "thumbnail":None, "author":None}
 
@@ -74,6 +78,7 @@ class Download:
         best = video.getbestaudio()
         playurl = best.url
 
+        print(playurl)
         return {"url":playurl, "title":title, "thumbnail":thumbnail, "author":author}
 
     def youtube_search(self, words):
