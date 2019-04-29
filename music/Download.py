@@ -67,7 +67,7 @@ class Download:
                 file_path = info_dict.get('url', None)
                 print(file_path)
             
-        return {"url":file_path, "title":None, "thumbnail":None, "author":None}
+        return {"url":file_path, "title":info_dict.get('title', None), "thumbnail":info_dict.get('thumbnails', None)[0]["url"], "author":info_dict.get('uploader', None)}
 
     def youtube_stream(self, youtube_url, ext):
         url = youtube_url[0]
