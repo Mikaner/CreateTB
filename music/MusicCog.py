@@ -22,8 +22,9 @@ class MusicCog(commands.Cog):
         self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
         self.devnull = open(os.devnull, 'w')
         # Pathを使ってみたいということで編集中
-        # ディレクトリトラバーサルはlist指定型で防ごうと思います。→検索でいんじゃね？
+        # ディレクトリトラバーサルはlist指定型で防ごうと思います
         self.local = Path("./music/local_music_file/")
+        self.files = os.listdir("music/local_music_files/secret")
         # thumbnailを使うとは言っていない
         self.local_thumbnail = "./music/local_music_file/thumbnail.png"
 
@@ -94,14 +95,13 @@ class MusicCog(commands.Cog):
         except TypeError:
             await ctx.send("TypeError")
         embed = discord.Embed(title="My local files")
-        for filePATH,fileDirectry,files in os.walk("music/local_music_files/secret"):
-            # Page processing
-            if -1 < page <= (len(files)//20):
-                for i in range(page*20, (page+1)*20 if len(files) > (page+1)*20 else len(files)):
-                    embed.add_field(name=files[i],value=filePATH)
-            else:
-                await ctx.send(embed=discord.Embed(title="OutOfPage", colour=0xff0000))
-                return
+        # Page processing
+        if -1 < page <= (len(self.files)//20):
+            for i in range(page*20, (page+1)*20 if len(self.files) > (page+1)*20 else len(self.files)):
+                embed.add_field(name=self.files[i],value=self.local)
+        else:
+            await ctx.send(embed=discord.Embed(title="OutOfPage", colour=0xff0000))
+            return
 
         await ctx.send(embed=embed)
 
@@ -146,7 +146,12 @@ class MusicCog(commands.Cog):
             # play local file
             print("play local",args)
             file_name = " ".join(args[1::])
-            self.Q.add_queue({"url":'./music/local_music_files/secret/'+file_name,"title":file_name[:len(file_name)-4:], "thumbnail":None, "author":"Cannot read, please wait."})
+            files = [n for n in self.files if file_name in n]
+            if len(files)==1:
+                self.Q.add_queue({"url":'./music/local_music_files/secret/'+self.files[self.files.index(files[0])],"title":self.files[self.files.index(files[0])][:len(file_name)-4:], "thumbnail":None, "author":"Cannot read, please wait."})
+            else:
+                await ctx.send(f"Which file would you like to listen {', '.join(files)} ?")
+                return
 
         else:
             print("search2 ",args)
