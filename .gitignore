@@ -1,6 +1,6 @@
 config/config.json
-music/local_music_files/secret
-music/local_music_files/test
+music/local_music_files/*
+!music/local_music_files/MikeTest.mp3
 music/downloaded_music_files/*
+!music/downloaded_music_files/.hidden
 __pycache__
-venv
