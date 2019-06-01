@@ -148,7 +148,7 @@ class MusicCog(commands.Cog):
             file_name = " ".join(args[1::])
             files = [n for n in self.files if file_name in n]
             if len(files)==1:
-                self.Q.add_queue({"url":'./music/local_music_files'+self.files[self.files.index(files[0])],"title":self.files[self.files.index(files[0])][:len(file_name)-4:], "thumbnail":None, "author":"Cannot read, please wait."})
+                self.Q.add_queue({"url":'./music/local_music_files/'+self.files[self.files.index(files[0])],"title":self.files[self.files.index(files[0])][:len(file_name)-4:], "thumbnail":None, "author":"Cannot read, please wait."})
             else:
                 await ctx.send(f"Which file would you like to listen {', '.join(files)} ?")
                 return
