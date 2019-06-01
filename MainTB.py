@@ -22,12 +22,15 @@ class MainTB(commands.Bot):
             except Exception:
                 traceback.print_exc()
 
-
     async def on_ready(self):
         print('Logged in as')
         print(self.user.name)
         print(self.user.id)
         print('message'.center(15, '-'))
+
+    async def on_message(self, message):
+        if message.content.startswith(config.get_prefix()):
+            await self.process_commands(message)
 
     async def on_command_error(self, ctx, error):
         if isinstance(error, CommandNotFound):
