@@ -4,3 +4,5 @@ music/local_music_files/*
 music/downloaded_music_files/*
 !music/downloaded_music_files/.hidden
 __pycache__
+TBenv
+
