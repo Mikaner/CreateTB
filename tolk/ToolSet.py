@@ -20,3 +20,10 @@ class ToolSet():
         sum_exp_x = np.sum(exp_x)
         y = exp_x / sum_exp_x
         return y
+
+    def mean_squared_error(self, y, t):
+        return 0.5 * np.sum((y-t)**2)
+
+    def cross_entropy_error(self, y, t):
+        delta = 1e-7
+        return -np.sum(t * np.log(y + delta))
