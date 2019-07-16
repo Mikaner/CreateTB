@@ -13,7 +13,8 @@ import re
 class MusicCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.voice_client = None
+        #self.voice_client = None
+        self.voice_client = {}
         self.Q = Queue()
         self.setting = Settings()
         self.now_playing = None
@@ -25,8 +26,6 @@ class MusicCog(commands.Cog):
         # ディレクトリトラバーサルはlist指定型で防ごうと思います
         self.local = Path("./music/local_music_file/")
         self.files = os.listdir("music/local_music_files")
-        # thumbnailを使うとは言っていない
-        self.local_thumbnail = "./music/local_music_file/thumbnail.png"
 
 
     def is_url_valid(self, url):
@@ -57,7 +56,8 @@ class MusicCog(commands.Cog):
 
         return ctx.send(embed=embed)
 
-    def next(self):# need to adjust
+    #def next(self):# need to adjust
+    def next(self, ctx):
         if self.is_queue_looped:
             self.Q.add_queue(self.now_playing)
 
@@ -70,23 +70,28 @@ class MusicCog(commands.Cog):
         self.now_playing = self.Q.next_job()
 
         if self.is_local(self.now_playing["url"]):
-            self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing["url"]), after=lambda e: self.next())
+            self.voice_client[f'{ctx.author.voice.channel}'].play(discord.FFmpegPCMAudio(self.now_playing["url"]), after=lambda e: self.next(ctx))
         else:
-            self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing["url"], stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
+            self.voice_client[f'{ctx.author.voice.channel}'].play(discord.FFmpegPCMAudio(self.now_playing["url"], stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next(ctx))
+    
+    def add_channel(self, ctx):
+        if not f'{ctx.author.voice.channel}' in self.voice_client:
+            self.voice_client[f'{ctx.author.voice.channel}'] = None
 
     @commands.command()
     async def join(self, ctx):
+        self.add_channel(ctx)
 
-        if self.voice_client is not None and self.voice_client.is_connected():
-            await self.voice_client.disconnect()
+        if self.voice_client[f'{ctx.author.voice.channel}'] is not None and self.voice_client[f'{ctx.author.voice.channel}'].is_connected():
+            await self.voice_client[f'{ctx.author.voice.channel}'].disconnect()
 
         if ctx.author.voice is None:
             await ctx.send(embed=discord.Embed(title='Please join a voice channel before $join', colour=0x00bfff))
             return
 
         voice_channel = ctx.author.voice.channel
-        self.voice_client = await voice_channel.connect()
-        await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client.channel} ! :thumbsup:", colour=0x00bfff))
+        self.voice_client[f'{ctx.author.voice.channel}'] = await voice_channel.connect()
+        await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client[f'{ctx.author.voice.channel}'].channel} ! :thumbsup:", colour=0x00bfff))
 
     @commands.command()
     async def show_local_file(self, ctx, *args):
@@ -107,14 +112,16 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def play(self, ctx, *args):
-        if self.voice_client is None:
+        self.add_channel(ctx)
+
+        if self.voice_client[f'{ctx.author.voice.channel}'] is None:
             if ctx.author.voice is None:
                 await ctx.send(embed=discord.Embed(title='Please join a voice channel before $join', colour=0x00bfff))
                 return
             
             voice_channel = ctx.author.voice.channel
-            self.voice_client = await voice_channel.connect()
-            await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client.channel} ! :thumbsup:", colour=0x00bfff))
+            self.voice_client[f'{ctx.author.voice.channel}'] = await voice_channel.connect()
+            await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client[f'{ctx.author.voice.channel}'].channel} ! :thumbsup:", colour=0x00bfff))
 
         if len(args) == 0:
             print("test")
@@ -173,12 +180,12 @@ class MusicCog(commands.Cog):
         await ctx.send(embed=embed)
 
 
-        if not self.voice_client.is_playing():
+        if not self.voice_client[f'{ctx.author.voice.channel}'].is_playing():
             self.now_playing = self.Q.next_job()
             if self.is_local(self.now_playing["url"]):
-                self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing["url"]), after=lambda e: self.next())
+                self.voice_client[f'{ctx.author.voice.channel}'].play(discord.FFmpegPCMAudio(self.now_playing["url"]), after=lambda e: self.next(ctx))
             else:
-                self.voice_client.play(discord.FFmpegPCMAudio(self.now_playing["url"], stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next())
+                self.voice_client[f'{ctx.author.voice.channel}'].play(discord.FFmpegPCMAudio(self.now_playing["url"], stderr=self.devnull, before_options=self.beforeArgs), after=lambda e: self.next(ctx))
 
     @commands.command()
     async def loopqueue(self, ctx):
@@ -197,36 +204,40 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def stop(self, ctx):
-        if self.voice_client is None:
+        self.add_channel(ctx)
+        if self.voice_client[f'{ctx.author.voice.channel}'] is None:
             return
-        if self.voice_client.is_playing():
-            self.voice_client.pause()
+        if self.voice_client[f'{ctx.author.voice.channel}'].is_playing():
+            self.voice_client[f'{ctx.audio.voice.channel}'].pause()
             await ctx.send(embed=discord.Embed(title="Paused", colour=0x47ea7a))
 
 
     @commands.command()
     async def start(self, ctx):
-        if self.voice_client is None:
+        self.add_channel(ctx)
+        if self.voice_client[f'{ctx.author.voice.channel}'] is None:
             return
-        if self.voice_client.is_paused():
-            self.voice_client.resume()
+        if self.voice_client[f'{ctx.author.voice.channel}'].is_paused():
+            self.voice_client[f'{ctx.author.voice.channel}'].resume()
             await ctx.send(embed=discord.Embed(title="Resumed", colour=0x47ea7a))
 
     @commands.command()
     async def skip(self, ctx):
-        if self.voice_client is None:
+        self.add_channel(ctx)
+        if self.voice_client[f'{ctx.author.voice.channel}'] is None:
             return
         await ctx.send(embed=discord.Embed(title=self.now_playing["title"]+' was skipped', colour=0x47ea7a))
-        self.voice_client.stop()
+        self.voice_client[f'{ctx.author.voice.channel}'].stop()
 
     @commands.command()
     async def remove(self, ctx, position):
-        if self.voice_client is None:
+        self.add_channel(ctx)
+        if self.voice_client[f'{ctx.author.voice.channel}'] is None:
             return
         try:
             if int(position)==0:
                 await ctx.send(embed=discord.Embed(title=self.now_playing["title"]+' was skipeed', colour=0x47ea7a))
-                self.voice_client.stop()
+                self.voice_client[f'{ctx.author.voice.channel}'].stop()
                 return
             position = self.Q.convert_value(int(position))
         except TypeError:
@@ -275,10 +286,11 @@ class MusicCog(commands.Cog):
 
     @commands.command()
     async def disconnect(self, ctx):
-        if self.voice_client is None:
+        self.add_channel(ctx)
+        if self.voice_client[f'{ctx.author.voice.channel}'] is None:
             return
-        if self.voice_client.is_connected():
-            await self.voice_client.disconnect()
+        if self.voice_client[f'{ctx.author.voice.channel}'].is_connected():
+            await self.voice_client[f'{ctx.author.voice.channel}'].disconnect()
 
     @commands.command()
     async def help(self, ctx):
