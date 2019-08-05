@@ -208,7 +208,7 @@ class MusicCog(commands.Cog):
         if self.voice_client[f'{ctx.author.voice.channel}'] is None:
             return
         if self.voice_client[f'{ctx.author.voice.channel}'].is_playing():
-            self.voice_client[f'{ctx.audio.voice.channel}'].pause()
+            self.voice_client[f'{ctx.author.voice.channel}'].pause()
             await ctx.send(embed=discord.Embed(title="Paused", colour=0x47ea7a))
 
 
