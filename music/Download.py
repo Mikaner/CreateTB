@@ -13,11 +13,11 @@ class Download:
         self.executor = concurrent.futures.ProcessPoolExecutor(max_workers=2)
         self.config = Config()
 
-
     def youtube_dl(self, youtube_url, ext):
         url = youtube_url[0]
         parsed = urlparse.urlparse(url)
-        file_path = 'music/downloaded_music_files/youtube/' + urlparse.parse_qs(parsed.query)['v'][0] + '.' + ext
+        file_path = 'music/downloaded_music_files/youtube/' + \
+            urlparse.parse_qs(parsed.query)['v'][0] + '.' + ext
 
         if not os.path.isfile(file_path):
             ydl_opts = {
@@ -31,14 +31,15 @@ class Download:
             }
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 ydl.download(youtube_url)
-            
+
         return file_path
 
     def niconico_dl(self, niconico_url, ext):
         executor = concurrent.futures.ProcessPoolExecutor(max_workers=2)
         url = niconico_url[0]
         parsed = urlparse.urlparse(url)
-        file_path = 'music/downloaded_music_files/niconico/' + os.path.basename(parsed.path) + '.' + ext
+        file_path = 'music/downloaded_music_files/niconico/' + \
+            os.path.basename(parsed.path) + '.' + ext
 
         if not os.path.isfile(file_path):
             ydl_opts = {
@@ -61,13 +62,17 @@ class Download:
                 'usenetrc': True,
             }
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                #self.executor.submit(ydl.download(niconico_url))
+                # self.executor.submit(ydl.download(niconico_url))
                 info_dict = ydl.extract_info(niconico_url[0], download=False)
                 print(info_dict)
                 file_path = info_dict.get('url', None)
                 print(file_path)
-            
-        return {"url":file_path, "title":info_dict.get('title', None), "thumbnail":info_dict.get('thumbnails', None)[0]["url"], "author":info_dict.get('uploader', None)}
+
+        return {
+            "url": file_path, "title": info_dict.get(
+                'title', None), "thumbnail": info_dict.get(
+                'thumbnails', None)[0]["url"], "author": info_dict.get(
+                'uploader', None)}
 
     def youtube_stream(self, youtube_url, ext):
         url = youtube_url[0]
@@ -79,14 +84,21 @@ class Download:
         playurl = best.url
 
         print(playurl)
-        return {"url":playurl, "title":title, "thumbnail":thumbnail, "author":author}
+        return {
+            "url": playurl,
+            "title": title,
+            "thumbnail": thumbnail,
+            "author": author}
 
     def youtube_search(self, words):
         youtube_api_service_name = 'youtube'
         youtube_api_version = 'v3'
 
         developer_key = self.config.get_API_key()
-        youtube = build(youtube_api_service_name, youtube_api_version, developerKey=developer_key)
+        youtube = build(
+            youtube_api_service_name,
+            youtube_api_version,
+            developerKey=developer_key)
 
         search_response = youtube.search().list(
             q=words,
@@ -103,12 +115,13 @@ class Download:
 
         return url
 
-      
 
 if __name__ == '__main__':
     download = Download()
     try:
         #download.youtube_dl(['https://www.youtube.com/watch?v=tSTqQyU9DsM&t=2s'], 'mp3')
-        download.niconico_dl(['https://www.nicovideo.jp/watch/sm15967835'], 'mp3')
+        download.niconico_dl(
+            ['https://www.nicovideo.jp/watch/sm15967835'], 'mp3')
     except DownloadError:
-        download.niconico_dl(['https://www.nicovideo.jp/watch/sm15967835'], 'mp3')
+        download.niconico_dl(
+            ['https://www.nicovideo.jp/watch/sm15967835'], 'mp3')

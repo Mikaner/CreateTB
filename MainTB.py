@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 from Config import Config
@@ -38,23 +37,23 @@ class MainTB(commands.Bot):
         if message.content.startswith("にゃーん"):
             await message.channel.send("にゃーん")
 
-
         dice = re.compile(u'/d (.+)d(.+)').match(message.content)
-        if dice:# dice計算用
+        if dice:  # dice計算用
             try:
-                reply = dice.group()+':\n' # dice.group():受け取ったmessageのうち、判定に使った情報
-                diceSum = 0 # 合計計算用の受け取り変数を用意
+                reply = dice.group() + ':\n'  # dice.group():受け取ったmessageのうち、判定に使った情報
+                diceSum = 0  # 合計計算用の受け取り変数を用意
                 if int(dice.group(1)) <= 992:
-                    for i in range(int(dice.group(1))):# 2d6だった場合、2回for文を回す
-                        r = random.randrange(0,int(dice.group(2)))+1 # 2d6だった場合、0~5をランダムで選択し、+1する
+                    for i in range(int(dice.group(1))):  # 2d6だった場合、2回for文を回す
+                        # 2d6だった場合、0~5をランダムで選択し、+1する
+                        r = random.randrange(0, int(dice.group(2))) + 1
                         diceSum += r
-                        reply += ' '+str(r)
-                    reply += '\n⇒ '+str(diceSum)
+                        reply += ' ' + str(r)
+                    reply += '\n⇒ ' + str(diceSum)
                 else:
                     reply = 'ちょ、多すぎ！もっとちっちゃくして！'
-            except ValueError: # 大体変なことするとfor文の中のint()の部分で型のエラーが出るからそれをcatch
+            except ValueError:  # 大体変なことするとfor文の中のint()の部分で型のエラーが出るからそれをcatch
                 reply = '数値じゃないと...わかんないのです....'
-            finally: # どっちにしろこの文は起動するからfinally使ってます。正直いらないと思う。見やすいからいるかな？
+            finally:  # どっちにしろこの文は起動するからfinally使ってます。正直いらないと思う。見やすいからいるかな？
                 await message.channel.send(reply)
 
     async def on_command_error(self, ctx, error):
@@ -62,7 +61,6 @@ class MainTB(commands.Bot):
             await ctx.send("No such command")
             return
         raise error
-
 
 
 if __name__ == "__main__":

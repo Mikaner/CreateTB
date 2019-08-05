@@ -1,8 +1,9 @@
 import json
 
+
 class Config:
     def __init__(self):
-        with open("./config/config.json",'r',encoding="utf-8") as code:
+        with open("./config/config.json", 'r', encoding="utf-8") as code:
             self.config = json.load(code)
 
     def get_token(self):

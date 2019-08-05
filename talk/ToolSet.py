@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class ToolSet():
     def __init__(self):
         pass
@@ -9,7 +10,7 @@ class ToolSet():
         return y.astype(np.int)
 
     def sigmoid(self, x):
-        return 1/(1+np.exp(-x))
+        return 1 / (1 + np.exp(-x))
 
     def relu(self, x):
         return np.maximum(0, x)
@@ -22,7 +23,7 @@ class ToolSet():
         return y
 
     def mean_squared_error(self, y, t):
-        return 0.5 * np.sum((y-t)**2)
+        return 0.5 * np.sum((y - t)**2)
 
     def cross_entropy_error(self, y, t):
         delta = 1e-7
