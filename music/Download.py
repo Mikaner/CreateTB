@@ -83,7 +83,7 @@ class Download:
         best = video.getbestaudio()
         playurl = best.url
 
-        print(playurl)
+        print(title)
         return {
             "url": playurl,
             "title": title,

@@ -56,9 +56,7 @@ class MusicCog(commands.Cog):
             color=0x00bfff)
         for index, job in enumerate(self.Q.get_queue()):
             embed.add_field(
-                name=str(
-                    index +
-                    1) +
+                name=str( index + 1) +
                 " : " +
                 job["title"],
                 value=job["author"],
@@ -112,7 +110,7 @@ class MusicCog(commands.Cog):
         await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client[f'{ctx.author.voice.channel}'].channel} ! :thumbsup:", colour=0x00bfff))
 
     @commands.command()
-    async def show_local_file(self, ctx, *args):
+    async def show_local_files(self, ctx, *args):
         try:
             page = int(args[0]) - 1 if len(args) != 0 else 0
         except TypeError:
@@ -121,19 +119,17 @@ class MusicCog(commands.Cog):
         # Page processing
         if -1 < page <= (len(self.files) // 20):
             for i in range(
-                page *
-                20,
-                (page +
-                 1) *
-                20 if len(
-                    self.files) > (
-                    page +
-                    1) *
-                    20 else len(
-                    self.files)):
-                embed.add_field(name=self.files[i], value=self.local)
+                page * 20,
+                (page + 1) *
+                20 if len( self.files ) > ( page + 1 ) * 20 else len( self.files )):
+                embed.add_field(
+                    name=self.files[i],
+                    value=self.local)
         else:
-            await ctx.send(embed=discord.Embed(title="OutOfPage", colour=0xff0000))
+            await ctx.send(
+                embed=discord.Embed(
+                    title="OutOfPage",
+                    colour=0xff0000))
             return
 
         await ctx.send(embed=embed)
@@ -144,17 +140,25 @@ class MusicCog(commands.Cog):
 
         if self.voice_client[f'{ctx.author.voice.channel}'] is None:
             if ctx.author.voice is None:
-                await ctx.send(embed=discord.Embed(title='Please join a voice channel before $join', colour=0x00bfff))
+                await ctx.send(
+                    embed=discord.Embed(
+                        title='Please join a voice channel before $join',
+                        colour=0x00bfff))
                 return
 
             voice_channel = ctx.author.voice.channel
             self.voice_client[f'{ctx.author.voice.channel}'] = await voice_channel.connect()
-            await ctx.send(embed=discord.Embed(title=f"Successfuly connected to {self.voice_client[f'{ctx.author.voice.channel}'].channel} ! :thumbsup:", colour=0x00bfff))
+            await ctx.send(
+                embed=discord.Embed(
+                    title=f"Successfuly connected to {self.voice_client[f'{ctx.author.voice.channel}'].channel} ! :thumbsup:",
+                    colour=0x00bfff))
 
         if len(args) == 0:
             print("test")
             self.Q.add_queue({"url": './music/local_music_files/MikeTest.mp3',
-                              "title": "MikeTest.mp3", "thumbnail": None, "author": "Mikaner"})
+                              "title": "MikeTest.mp3",
+                              "thumbnail": None,
+                              "author": "Mikaner"})
 
         elif len(args) == 1:
             print("1", args)
@@ -164,11 +168,13 @@ class MusicCog(commands.Cog):
                 if service == 'youtube':
                     self.Q.add_queue(
                         self.download.youtube_stream(
-                            args, self.setting.settings['download_file_ext']))
+                            args,
+                            self.setting.settings['download_file_ext']))
                 elif service == 'niconico':
                     self.Q.add_queue(
                         self.download.niconico_dl(
-                            args, self.setting.settings['download_file_ext']))
+                            args,
+                            self.setting.settings['download_file_ext']))
 
             else:
                 # assert args is search words
@@ -190,9 +196,10 @@ class MusicCog(commands.Cog):
             file_name = " ".join(args[1::])
             files = [n for n in self.files if file_name in n]
             if len(files) == 1:
-                self.Q.add_queue({"url": './music/local_music_files/' +
-                                  self.files[self.files.index(files[0])], "title": self.files[self.files.index(files[0])][:len(file_name) -
-                                                                                                                          4:], "thumbnail": None, "author": "Cannot read, please wait."})
+                self.Q.add_queue({"url": './music/local_music_files/' + self.files[self.files.index(files[0])],
+                                  "title": self.files[self.files.index(files[0])] + "\n",
+                                  "thumbnail": None,
+                                  "author": "Cannot read, please wait."})
             else:
                 await ctx.send(f"Which file would you like to listen {', '.join(files)} ?")
                 return
@@ -224,7 +231,8 @@ class MusicCog(commands.Cog):
             self.now_playing = self.Q.next_job()
             if self.is_local(self.now_playing["url"]):
                 self.voice_client[f'{ctx.author.voice.channel}'].play(
-                    discord.FFmpegPCMAudio(self.now_playing["url"]), after=lambda e: self.next(ctx))
+                    discord.FFmpegPCMAudio(self.now_playing["url"]),
+                    after=lambda e: self.next(ctx))
             else:
                 self.voice_client[f'{ctx.author.voice.channel}'].play(
                     discord.FFmpegPCMAudio(
@@ -359,6 +367,7 @@ class MusicCog(commands.Cog):
 
 
 if __name__ == '__main__':
+    '''
     config = Config()
     bot = commands.Bot(
         command_prefix=config.get_prefix(),
@@ -367,3 +376,5 @@ if __name__ == '__main__':
     bot.remove_command('help')
     bot.add_cog(MusicCog(bot))
     bot.run(config.get_token())
+    '''
+    print("don't use onry MusicCog")
