@@ -6,10 +6,11 @@ import settings
 prefix = "$"
 voice_client = None
 
-bot = commands.Bot(command_prefix=prefix, description='A bot that greets the user back.')
-with open('./config/config.json','r',encoding='utf-8') as tokenCode:
+bot = commands.Bot(
+    command_prefix=prefix,
+    description='A bot that greets the user back.')
+with open('./config/config.json', 'r', encoding='utf-8') as tokenCode:
     token = json.load(tokenCode)
-
 
 
 @bot.event
@@ -22,12 +23,12 @@ async def on_ready():
 
 @bot.command()
 async def add(ctx, a: int, b: int):
-    await ctx.send(a+b)
+    await ctx.send(a + b)
 
 
 @bot.command()
 async def multiply(ctx, a: int, b: int):
-    await ctx.send(a*b)
+    await ctx.send(a * b)
 
 
 @bot.command()
@@ -59,20 +60,23 @@ async def help(ctx):
 async def greet(ctx):
     await ctx.send(":smiley: こんにちは！ :wave:")
 
+
 @bot.command()
 async def join(ctx):
     global voice_client
     voice_channel = ctx.guild.voice_channels[0]
     voice_client = await voice_channel.connect()
 
+
 @bot.command()
 async def play(ctx):
     global voice_client
-    if voice_client==None:
-        #join(ctx) <- 'Command' object is not callable
+    if voice_client is None:
+        # join(ctx) <- 'Command' object is not callable
         voice_channel = ctx.guild.voice_channels[0]
         voice_client = await voice_channel.connect()
-    audio_source = discord.FFmpegPCMAudio("./music/secret/14 TODAY THE FUTURE Magical Mirai ver.wma")
+    audio_source = discord.FFmpegPCMAudio(
+        "./music/secret/14 TODAY THE FUTURE Magical Mirai ver.wma")
     if not voice_client.is_playing():
         voice_client.play(audio_source)
 
@@ -80,24 +84,26 @@ async def play(ctx):
 @bot.command()
 async def stop(ctx):
     global voice_client
-    if voice_client==None:
+    if voice_client is None:
         return
     if voice_client.is_playing():
         voice_client.pause()
     elif voice_client.is_paused():
         voice_client.resume()
 
+
 @bot.command()
 async def remove(ctx):
     global voice_client
-    if voice_client==None:
+    if voice_client is None:
         return
     voice_client.stop()
+
 
 @bot.command()
 async def disconnect(ctx):
     global voice_client
-    if voice_client==None:
+    if voice_client is None:
         return
     if voice_client.is_connected():
         await voice_client.disconnect()

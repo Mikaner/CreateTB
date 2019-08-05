@@ -5,7 +5,7 @@ class Queue:
         self.queue = list()
 
     def convert_value(self, position: int):
-        return position if position < 1 else position-1
+        return position if position < 1 else position - 1
 
     def add_queue(self, job):
         self.queue.append(job)
@@ -17,7 +17,7 @@ class Queue:
             elif position == -1:
                 self.queue.append(job)
             else:
-                self.queue.insert(position+1)
+                self.queue.insert(position + 1)
         except IndexError:
             raise
 
