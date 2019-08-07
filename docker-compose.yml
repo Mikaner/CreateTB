@@ -1,0 +1,9 @@
+version: '2'
+services:
+  bot:
+    build: .
+    command: python MainTB.py
+    volumes:
+      - .:/src/app
+    ports:
+      - "3000:3000"
