@@ -1,0 +1,4 @@
+./*
+!./__init__.py
+!./download_MNIST.py
+!./mnist.py
