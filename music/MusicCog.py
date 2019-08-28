@@ -7,6 +7,7 @@ from apiclient.errors import HttpError
 
 class MusicCog(commands.Cog, BaseMusicPlayer):
     def __init__(self, bot):
+        super(MusicCog, self).__init__()
         self.bot = bot
         self.setting = Settings()
 
@@ -146,7 +147,7 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
 
         if not self.voice_client[f'{ctx.author.voice.channel}'].is_playing():
             self.now_playing = self.Q.next_job()
-            self.play_audio(self.now_playing["url"])
+            self.play_audio(ctx, self.now_playing["url"])
 
     @commands.command()
     async def loopqueue(self, ctx):

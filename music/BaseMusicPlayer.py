@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 class BaseMusicPlayer:
-    def __init__():
+    def __init__(self):
         self.voice_client = {}
         self.Q = Queue()
         self.now_playing = None
@@ -55,7 +55,7 @@ class BaseMusicPlayer:
 
         return ctx.send(embed=embed)
 
-    def play_audio(url):
+    def play_audio(self, ctx, url):
         if self.is_local(self.now_playing["url"]):
             self.voice_client[f'{ctx.author.voice.channel}'].play(
                 discord.FFmpegPCMAudio(
@@ -81,7 +81,7 @@ class BaseMusicPlayer:
         print('load next audio')
 
         self.now_playing = self.Q.next_job()
-        self.play_audio(self.now_playing["url"])
+        self.play_audio(ctx, self.now_playing["url"])
 
 
     def add_channel(self, ctx):
