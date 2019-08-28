@@ -145,7 +145,7 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
         embed.set_author(name=add["author"])
         await ctx.send(embed=embed)
 
-        if not self.voice_client[f'{ctx.author.voice.channel}'].is_playing():
+        if not self.voice_client[f'{ctx.author.voice.channel}'].is_playing() and not self.voice_client[f'{ctx.author.voice.channel}'].is_paused():
             self.now_playing = self.Q.next_job()
             self.play_audio(ctx, self.now_playing["url"])
 
