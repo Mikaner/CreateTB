@@ -1,98 +1,15 @@
 import discord
 from discord.ext import commands
 from music.Setting import Settings
-from music.Download import Download
-from music.Queue import Queue
-import os
+from music.BaseMusicPlayer import BaseMusicPlayer
 from apiclient.errors import HttpError
-from pathlib import Path
 
 
-class MusicCog(commands.Cog):
+class MusicCog(commands.Cog, BaseMusicPlayer):
     def __init__(self, bot):
         self.bot = bot
-        #self.voice_client = None
-        self.voice_client = {}
-        self.Q = Queue()
         self.setting = Settings()
-        self.now_playing = None
-        self.is_queue_looped = False
-        self.download = Download()
-        self.beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
-        self.devnull = open(os.devnull, 'w')
-        # Pathを使ってみたいということで編集中
-        # ディレクトリトラバーサルはlist指定型で防ごうと思います
-        self.local = Path("./music/local_music_file/")
-        self.files = os.listdir("music/local_music_files")
 
-    def is_url_valid(self, url):
-        if url.startswith('https://www.youtube.com/watch?v='):
-            return (True, 'youtube')
-        elif url.startswith('https://www.nicovideo.jp/watch/sm'):
-            return (True, 'niconico')
-        else:
-            return (False, '')
-
-    def is_local(self, url):
-        if url.startswith('http'):
-            return False
-        else:
-            return True
-
-    def show_now_playing(self, ctx):
-        embed = discord.Embed(
-            title='Now Playing',
-            description=self.now_playing["title"],
-            color=0x00bfff)
-        if self.now_playing["thumbnail"] is not None:
-            embed.set_thumbnail(url=self.now_playing["thumbnail"])
-
-        return ctx.send(embed=embed)
-
-    def status_queue(self, ctx):
-        embed = discord.Embed(
-            title='Status of Queue',
-            description="In queue :",
-            color=0x00bfff)
-        for index, job in enumerate(self.Q.get_queue()):
-            embed.add_field(
-                name=str( index + 1) +
-                " : " +
-                job["title"],
-                value=job["author"],
-                inline=True)
-
-        return ctx.send(embed=embed)
-
-    # def next(self):# need to adjust
-    def next(self, ctx):
-        if self.is_queue_looped:
-            self.Q.add_queue(self.now_playing)
-
-        if self.Q.get_queue() == []:
-            print("done Now Queue is empty")
-            return
-
-        print('load next audio')
-
-        self.now_playing = self.Q.next_job()
-
-        if self.is_local(self.now_playing["url"]):
-            self.voice_client[f'{ctx.author.voice.channel}'].play(
-                discord.FFmpegPCMAudio(
-                    self.now_playing["url"]),
-                after=lambda e: self.next(ctx))
-        else:
-            self.voice_client[f'{ctx.author.voice.channel}'].play(
-                discord.FFmpegPCMAudio(
-                    self.now_playing["url"],
-                    stderr=self.devnull,
-                    before_options=self.beforeArgs),
-                after=lambda e: self.next(ctx))
-
-    def add_channel(self, ctx):
-        if not f'{ctx.author.voice.channel}' in self.voice_client:
-            self.voice_client[f'{ctx.author.voice.channel}'] = None
 
     @commands.command()
     async def join(self, ctx):
@@ -229,17 +146,7 @@ class MusicCog(commands.Cog):
 
         if not self.voice_client[f'{ctx.author.voice.channel}'].is_playing():
             self.now_playing = self.Q.next_job()
-            if self.is_local(self.now_playing["url"]):
-                self.voice_client[f'{ctx.author.voice.channel}'].play(
-                    discord.FFmpegPCMAudio(self.now_playing["url"]),
-                    after=lambda e: self.next(ctx))
-            else:
-                self.voice_client[f'{ctx.author.voice.channel}'].play(
-                    discord.FFmpegPCMAudio(
-                        self.now_playing["url"],
-                        stderr=self.devnull,
-                        before_options=self.beforeArgs),
-                    after=lambda e: self.next(ctx))
+            self.play_audio(self.now_playing["url"])
 
     @commands.command()
     async def loopqueue(self, ctx):
@@ -364,17 +271,3 @@ class MusicCog(commands.Cog):
     async def logout(self, ctx):
         await ctx.bot.logout()
         exit()
-
-
-if __name__ == '__main__':
-    '''
-    config = Config()
-    bot = commands.Bot(
-        command_prefix=config.get_prefix(),
-        description='music bot')
-
-    bot.remove_command('help')
-    bot.add_cog(MusicCog(bot))
-    bot.run(config.get_token())
-    '''
-    print("don't use onry MusicCog")
