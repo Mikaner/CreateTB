@@ -93,6 +93,12 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
                         self.download.niconico_dl(
                             args,
                             self.setting.settings['download_file_ext']))
+                elif service == 'spotify':
+                    self.Q.add_queue(
+                        self.download.spotify_stream(
+                            args[0]
+                        )
+                    )                    
 
             else:
                 # assert args is search words
