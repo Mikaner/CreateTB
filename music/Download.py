@@ -3,6 +3,9 @@ from youtube_dl.utils import DownloadError
 import urllib.parse as urlparse
 import os
 import pafy
+import spotipy
+import sys
+from spotipy.oauth2 import SpotifyClientCredentials
 import concurrent.futures
 from Config import Config
 from apiclient.discovery import build
@@ -89,6 +92,23 @@ class Download:
             "title": title,
             "thumbnail": thumbnail,
             "author": author}
+
+    def spotify_search(self, url):
+        client_credentials_manager = SpotifyClientCredentials(client_id=self.config.get_spotify_client_id(), client_secret=self.config.get_spotify_client_id())
+        spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+        resul
+
+
+    def spotify_search(self, words):
+        client_credentials_manager = SpotifyClientCredentials(client_id=self.config.get_spotify_client_id(), client_secret=self.config.get_spotify_client_id())
+        spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+        results = spotify.search(q="track:" + name, type="track")
+        track_id = results["tracks"]["items"][0]["url"].split(":")[2]
+
+        return "https://open.spotify.com/track/" + track_id
+
+
 
     def youtube_search(self, words):
         youtube_api_service_name = 'youtube'

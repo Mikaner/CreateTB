@@ -21,6 +21,8 @@ class BaseMusicPlayer:
             return (True, 'youtube')
         elif url.startswith('https://www.nicovideo.jp/watch/sm'):
             return (True, 'niconico')
+        elif url.startswith("https://open.spotify.com/track/"):
+            return (True, "spotify")
         else:
             return (False, '')
 
