@@ -13,7 +13,6 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import concurrent.futures
 from Config import Config
 from apiclient.discovery import build
-from music.utils.RedisQueue import RedisQueue
 
 
 class Download:
