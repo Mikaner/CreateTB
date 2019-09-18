@@ -2,7 +2,7 @@ FROM python:3.7.4
 
 WORKDIR /src/app
 RUN apt update
-RUN apt -y install ffmpeg
+RUN apt -y install ffmpeg libffi-dev
 
 COPY requirements.txt requirements.txt
 RUN set -x && \

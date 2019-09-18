@@ -90,15 +90,14 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
                             self.setting.settings['download_file_ext']))
                 elif service == 'niconico':
                     self.Q.add_queue(
-                        self.download.niconico_dl(
-                            args,
-                            self.setting.settings['download_file_ext']))
+                        self.download.niconico_stream(args[0])
+                    )
                 elif service == 'spotify':
                     self.Q.add_queue(
                         self.download.spotify_stream(
                             args[0]
                         )
-                    )                    
+                    )
 
             else:
                 # assert args is search words
@@ -153,7 +152,8 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
 
         if not self.voice_client[f'{ctx.author.voice.channel}'].is_playing() and not self.voice_client[f'{ctx.author.voice.channel}'].is_paused():
             self.now_playing = self.Q.next_job()
-            self.play_audio(ctx, self.now_playing["url"])
+            self.play_audio(ctx, self.now_playing)
+            print("The End of play()")
 
     @commands.command()
     async def loopqueue(self, ctx):
