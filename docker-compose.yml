@@ -1,6 +1,6 @@
 version: '2'
 services:
-  bot:
+  workspace:
     build: .
     image: bot
     tty: true

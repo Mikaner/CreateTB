@@ -6,3 +6,4 @@ music/downloaded_music_files/*
 __pycache__
 TBenv
 .env
+.vscode
