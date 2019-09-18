@@ -1,6 +1,12 @@
 # CreateTB
-* The test bot for discord
-* Need to get discord, discord bot token key, python 3.7, youtube-data-api key and Knowledge of command operation.
+* Discord Bot
+
+## prerequisites
+- discordapp
+- discord bot token key
+- python 3.7
+- youtube-data-api key
+- 
 
 ## Development environment for TB 
 * python 3.7.3
@@ -37,7 +43,8 @@
 
 ## How to use
 * Clone or download this repository.
-* Make config.json file with token and youtube-data-api key in config directory.
+* Create .env file  under the top of the project.
+  * You can copy or rename example.env
 ```
 {
     "token":"",
@@ -63,7 +70,7 @@ or
 ```bash
 py -3 MainTB.py
 ```
-* If you get a response below, success.
+* If you get a response below, Your bot will have logged in your guild successfully.
 ```
 Logged in as
 bot name
