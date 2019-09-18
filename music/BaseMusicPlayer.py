@@ -12,13 +12,11 @@ from celery_tasks.tasks import send_heart_beating
 
 class BaseMusicPlayer:
     def __init__(self):
-        self.voice_client = {}
+        self.voice_client = None
         self.Q = Queue()
         self.now_playing = None
         self.is_queue_looped = False
         self.download = Download()
-        # Pathを使ってみたいということで編集中
-        # ディレクトリトラバーサルはlist指定型で防ごうと思います
         self.local = Path("./music/local_music_file/")
         self.files = os.listdir("music/local_music_files")
 
@@ -66,7 +64,7 @@ class BaseMusicPlayer:
     def play_audio(self, ctx, music_info, nico_task=None):
         url = music_info["url"]
         if self.is_local(music_info["url"]):
-            self.voice_client[f'{ctx.author.voice.channel}'].play(
+            self.voice_client.play(
                 discord.FFmpegPCMAudio(
                     music_info["url"],
                 ),
@@ -85,7 +83,7 @@ class BaseMusicPlayer:
                 )
                 music_info["url"] = request_data["data"]["session"]["content_uri"]
 
-            self.voice_client[f'{ctx.author.voice.channel}'].play(
+            self.voice_client.play(
                 discord.FFmpegPCMAudio(
                     music_info["url"],
                     stderr=open(os.devnull, 'w'),
@@ -109,8 +107,3 @@ class BaseMusicPlayer:
         self.now_playing = self.Q.next_job()
         print(self.now_playing["url"])
         self.play_audio(ctx, self.now_playing, nico_task)
-
-
-    def add_channel(self, ctx):
-        if not f'{ctx.author.voice.channel}' in self.voice_client:
-            self.voice_client[f'{ctx.author.voice.channel}'] = None
