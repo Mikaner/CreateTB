@@ -1,70 +1,47 @@
-# CreateTB
-* The test bot for discord
-* Need to get discord, discord bot token key, python 3.7, youtube-data-api key and Knowledge of command operation.
 
-## Development environment for TB 
-* python 3.7.3
-* aiohttp 3.5.4
-* async-timeout 3.0.1
-* attrs 19.1.0
-* beautifulsoup4 4.7.1
-* cachetools 3.1.0
-* certifi 2019.3.9
-* cffi 1.12.2
-* chardet 3.0.4
-* discord 1.0.1
-* discord.py 1.1.1
-* google-api-python-client 1.7.9
-* google-auth 1.6.3
-* google-auth-httplib2 0.0.3
-* httplib2 0.12.1
-* idna 2.8
-* multidict 4.5.2
-* pafy 0.5.4
-* pyasn1 0.4.5
-* pyasn1-modules 0.2.4
-* pycparser 2.19
-* PyNaCl 1.2.1
-* requests 2.21.0
-* rsa 4.0
-* six 1.12.0
-* soupsieve 1.9
-* uritemplate 3.0.0
-* urllib3 1.24.1
-* websockets 6.0
-* yarl 1.3.0
-* youtube-dl 2019.5.20
+# CreateTB
+
+Discord Bot
+
+## prerequisites
+
+- discord app
+- discord bot token key
+- python 3.7
+- youtube-data-api key
+- docker
+- docker-compose
 
 ## How to use
-* Clone or download this repository.
-* Make config.json file with token and youtube-data-api key in config directory.
+
+- Clone or download this repository.
+- Create .env file  under the top of the project.
+  - You can copy or rename example.env
+
+```env
+REDIS_URL=redis://redis
+BOT_TOKEN=<DISCORD_BOT_TOKEN_HERE>
+GOOGLE_API_KEY=<GOOGLE_API_KEY_HERE>
+PREFIX=$
 ```
-{
-    "token":"",
-    "APIKey":"",
-    "prefix":"$"
-}
-```
-* If you do not want to pollute the environment, use a virtual environment such as venv, pyenv, pipenv or others.
-* Create environment.
-```
-pip install --upgrade pip
-pip install discord.py[voice] google-api-python-client youtube-dl pafy
-```
-* Execution command under this.
+
+- Let's Start Bot
+  - under the top of the project
+  - enter this command
+
 ```bash
-python MainTB.py
+docker-compose up -d --build
 ```
-or
+
+and
+
 ```bash
-python3 MainTB.py
+docker-compose run workspace python MainTB.py
 ```
-or
+
+If you get a response below, Your bot will have logged in your guild successfully.
+
 ```bash
-py -3 MainTB.py
-```
-* If you get a response below, success.
-```
 Logged in as
 bot name
 bot id
@@ -72,18 +49,17 @@ bot id
 ```
 
 ## How to custom
-* This bot can change the prefix. Do you want? In that case, change item of prefix in config.json file.
+
+If you want to change command prefix, change the value of prefix in .env
+
+For example, If you want to change prefix from "$" to "#", change .env from
+
 ```:from
-{
-    "token":"",
-    "APIKey":"",
-    "prefix":"$"
-}
+PREFIX=$
 ```
+
+to
+
 ```:to
-{
-    "token":"",
-    "APIKey":"",
-    "prefix":"&"
-}
+PREFIX=#
 ```

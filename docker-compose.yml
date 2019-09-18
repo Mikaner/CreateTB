@@ -1,9 +1,25 @@
 version: '2'
 services:
-  bot:
+  workspace:
     build: .
-    command: python MainTB.py
+    image: bot
+    tty: true
+    env_file: .env
     volumes:
       - .:/src/app
     ports:
       - "3000:3000"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis
+  
+  worker:
+    image: bot
+    env_file: .env
+    command: celery -A celery_tasks worker
+    volumes:
+      - .:/src/app
+    depends_on:
+      - redis

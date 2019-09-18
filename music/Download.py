@@ -1,8 +1,15 @@
 import youtube_dl
+import requests
+import time
+from bs4 import BeautifulSoup
+import json
 from youtube_dl.utils import DownloadError
 import urllib.parse as urlparse
 import os
 import pafy
+import spotipy
+import sys
+from spotipy.oauth2 import SpotifyClientCredentials
 import concurrent.futures
 from Config import Config
 from apiclient.discovery import build
@@ -34,45 +41,6 @@ class Download:
 
         return file_path
 
-    def niconico_dl(self, niconico_url, ext):
-        executor = concurrent.futures.ProcessPoolExecutor(max_workers=2)
-        url = niconico_url[0]
-        parsed = urlparse.urlparse(url)
-        file_path = 'music/downloaded_music_files/niconico/' + \
-            os.path.basename(parsed.path) + '.' + ext
-
-        if not os.path.isfile(file_path):
-            ydl_opts = {
-                'format': 'bestaudio/best',
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': ext,
-                    'preferredquality': '192',
-                }],
-                'outtmpl': file_path,
-                'restrictfilenames': True,
-                'noplaylist': True,
-                'nocheckcertificate': True,
-                'ignoreerrors': False,
-                'logtostderr': False,
-                'quiet': True,
-                'no_warnings': True,
-                'default_search': 'auto',
-                'source_address': '0.0.0.0',
-                'usenetrc': True,
-            }
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                # self.executor.submit(ydl.download(niconico_url))
-                info_dict = ydl.extract_info(niconico_url[0], download=False)
-                print(info_dict)
-                file_path = info_dict.get('url', None)
-                print(file_path)
-
-        return {
-            "url": file_path, "title": info_dict.get(
-                'title', None), "thumbnail": info_dict.get(
-                'thumbnails', None)[0]["url"], "author": info_dict.get(
-                'uploader', None)}
 
     def youtube_stream(self, youtube_url, ext):
         url = youtube_url[0]
@@ -85,16 +53,100 @@ class Download:
 
         print(title)
         return {
+            "service": "youtube",
             "url": playurl,
             "title": title,
             "thumbnail": thumbnail,
             "author": author}
+    
+    def niconico_stream(self, niconico_url):
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredquality': '192',
+            }],
+            'restrictfilenames': True,
+            'noplaylist': True,
+            'nocheckcertificate': True,
+            'ignoreerrors': False,
+            'logtostderr': False,
+            'quiet': True,
+            'no_warnings': True,
+            'default_search': 'auto',
+            'source_address': '0.0.0.0',
+            'usenetrc': True,
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(niconico_url, download=False)
+            print(info_dict)
+
+        return {
+            "service": "niconico",
+            "url": niconico_url,
+            "title": info_dict.get('title', None),
+            "thumbnail": info_dict.get('thumbnails', None)[0]["url"],
+            "author": info_dict.get('uploader', None)}
+
+
+    def spotify_stream(self, url):
+        """
+        client_credentials_manager = SpotifyClientCredentials(client_id=self.config.get_spotify_client_id(), client_secret=self.config.get_spotify_client_secret())
+        spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+        track_id = url.split("/")[4]
+        results = spotify.track(track_id)
+
+        title = results["name"]
+        thumbnail = results["album"]["images"][0]["url"]
+        author = results["album"]["artists"][0]["name"]
+        """
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredquality': '192',
+            }],
+            'restrictfilenames': True,
+            'noplaylist': True,
+            'nocheckcertificate': True,
+            'ignoreerrors': False,
+            'logtostderr': False,
+            'quiet': True,
+            'no_warnings': True,
+            'default_search': 'auto',
+            'source_address': '0.0.0.0',
+            'usenetrc': True,
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            print(info_dict)
+
+        """
+        return {
+            "service": "spotify",
+            "url": url,
+            "title": title,
+            "thumbnail": thumbnail,
+            "author": author
+        }
+        """
+
+
+    def spotify_search(self, words):
+        client_credentials_manager = SpotifyClientCredentials(client_id=self.config.get_spotify_client_id(), client_secret=self.config.get_spotify_client_id())
+        spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+        results = spotify.search(q="track:" + name, type="track")
+        track_id = results["tracks"]["items"][0]["url"].split(":")[2]
+
+        return "https://open.spotify.com/track/" + track_id
+
 
     def youtube_search(self, words):
         youtube_api_service_name = 'youtube'
         youtube_api_version = 'v3'
 
-        developer_key = self.config.get_API_key()
+        developer_key = self.config.get_api_key()
         youtube = build(
             youtube_api_service_name,
             youtube_api_version,
