@@ -64,6 +64,7 @@ class BaseMusicPlayer:
         return ctx.send(embed=embed)
 
     def play_audio(self, ctx, music_info, nico_task=None):
+        url = music_info["url"]
         if self.is_local(music_info["url"]):
             self.voice_client[f'{ctx.author.voice.channel}'].play(
                 discord.FFmpegPCMAudio(
@@ -91,6 +92,7 @@ class BaseMusicPlayer:
                     before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
                 ),
                 after=lambda e: self.next(ctx, nico_task))
+        music["info"] = url
 
 
     def next(self, ctx, nico_task=None):
