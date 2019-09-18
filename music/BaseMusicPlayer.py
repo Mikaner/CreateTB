@@ -92,7 +92,7 @@ class BaseMusicPlayer:
                     before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
                 ),
                 after=lambda e: self.next(ctx, nico_task))
-        music["url"] = url
+        music_info["url"] = url
 
 
     def next(self, ctx, nico_task=None):
@@ -107,6 +107,7 @@ class BaseMusicPlayer:
         print(nico_task)
 
         self.now_playing = self.Q.next_job()
+        print(self.now_playing["url"])
         self.play_audio(ctx, self.now_playing, nico_task)
 
 

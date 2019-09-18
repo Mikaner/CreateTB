@@ -152,6 +152,7 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
 
         if not self.voice_client[f'{ctx.author.voice.channel}'].is_playing() and not self.voice_client[f'{ctx.author.voice.channel}'].is_paused():
             self.now_playing = self.Q.next_job()
+            print(self.now_playing["url"])
             self.play_audio(ctx, self.now_playing)
             print("The End of play()")
 
