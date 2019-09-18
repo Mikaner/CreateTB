@@ -91,6 +91,7 @@ class Download:
 
 
     def spotify_stream(self, url):
+        """
         client_credentials_manager = SpotifyClientCredentials(client_id=self.config.get_spotify_client_id(), client_secret=self.config.get_spotify_client_secret())
         spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
         track_id = url.split("/")[4]
@@ -99,7 +100,30 @@ class Download:
         title = results["name"]
         thumbnail = results["album"]["images"][0]["url"]
         author = results["album"]["artists"][0]["name"]
+        """
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredquality': '192',
+            }],
+            'restrictfilenames': True,
+            'noplaylist': True,
+            'cookiefile': 'nico-cookie.txt',
+            'nocheckcertificate': True,
+            'ignoreerrors': False,
+            'logtostderr': False,
+            'quiet': True,
+            'no_warnings': True,
+            'default_search': 'auto',
+            'source_address': '0.0.0.0',
+            'usenetrc': True,
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            print(info_dict)
 
+        """
         return {
             "service": "spotify",
             "url": url,
@@ -107,6 +131,7 @@ class Download:
             "thumbnail": thumbnail,
             "author": author
         }
+        """
 
 
     def spotify_search(self, words):

@@ -2,7 +2,6 @@ from time import sleep
 import requests
 import json
 from datetime import datetime
-from worker import logger
 from bs4 import BeautifulSoup
 
 
