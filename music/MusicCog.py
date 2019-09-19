@@ -169,7 +169,6 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
 
     @commands.command()
     async def stop(self, ctx):
-        self.add_channel(ctx)
         if self.voice_client is None:
             return
         if self.voice_client.is_playing():
@@ -178,7 +177,6 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
 
     @commands.command()
     async def start(self, ctx):
-        self.add_channel(ctx)
         if self.voice_client is None:
             return
         if self.voice_client.is_paused():
@@ -187,7 +185,6 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
 
     @commands.command()
     async def skip(self, ctx):
-        self.add_channel(ctx)
         if self.voice_client is None:
             return
         await ctx.send(embed=discord.Embed(title=self.now_playing["title"] + ' was skipped', colour=0x47ea7a))
@@ -195,7 +192,6 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
 
     @commands.command()
     async def remove(self, ctx, position):
-        self.add_channel(ctx)
         if self.voice_client is None:
             return
         try:
@@ -252,7 +248,6 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
 
     @commands.command()
     async def disconnect(self, ctx):
-        self.add_channel(ctx)
         if self.voice_client is None:
             return
         if self.voice_client.is_connected():
