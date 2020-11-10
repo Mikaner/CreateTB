@@ -152,10 +152,12 @@ class Download:
             youtube_api_version,
             developerKey=developer_key)
 
+        print("youtube",youtube)
         search_response = youtube.search().list(
             q=words,
             part="id,snippet"
         ).execute()
+        print(search_response)
 
         videos = []
 

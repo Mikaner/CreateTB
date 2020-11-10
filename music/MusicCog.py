@@ -239,6 +239,10 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
     async def queue(self, ctx):
         await self.show_now_playing(ctx)
         await self.status_queue(ctx)
+    
+    @commands.command()
+    async def q(self, ctx):
+        queue()
 
     @commands.command()
     async def clear(self, ctx):
@@ -252,6 +256,10 @@ class MusicCog(commands.Cog, BaseMusicPlayer):
             return
         if self.voice_client.is_connected():
             await self.voice_client.disconnect()
+
+    @commands.command()
+    async def dc(self, ctx):
+        disconnect()
 
     @commands.command()
     async def help(self, ctx):
