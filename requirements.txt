@@ -41,7 +41,7 @@ pytz==2019.2
 redis==3.3.8
 requests==2.22.0
 rq==1.1.0
-rsa==4.0
+rsa==4.7
 six==1.12.0
 soupsieve==1.9.3
 spotipy==2.4.4
