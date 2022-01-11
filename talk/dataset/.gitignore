@@ -1,5 +1,0 @@
-*
-!/.gitignore
-!/__init__.py
-!/download_MNIST.py
-!/mnist.py

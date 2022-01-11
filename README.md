@@ -1,65 +1,17 @@
+# Discord sample bot working on glitch.com
 
-# CreateTB
+## How to launch bot
 
-Discord Bot
+1. Import this repository to `glitch.com`.
+1. Add this line to `.env` file; `DISCORD_BOT_TOKEN={YOUR_DISCORD_BOT_USER_TOKEN}`
+1. Just run on `glitch.com` !
 
-## prerequisites
+To get discord bot token, visit discord official develoer site; https://discordapp.com/developers/applications/me/
 
-- discord app
-- discord bot token key
-- python 3.7
-- youtube-data-api key
-- docker
-- docker-compose
+## Running bot 24h on glitch.com
 
-## How to use
+Applications on `glitch.com` may sleep when keep no access for 5 minutes.
+You must ping application URL every 5 minutes to run your bot continuously.
+Using `uptimerobot.com` service is just good.
 
-- Clone or download this repository.
-- Create .env file  under the top of the project.
-  - You can copy or rename example.env
-
-```env
-REDIS_URL=redis://redis
-BOT_TOKEN=<DISCORD_BOT_TOKEN_HERE>
-GOOGLE_API_KEY=<GOOGLE_API_KEY_HERE>
-PREFIX=$
-```
-
-- Let's Start Bot
-  - under the top of the project
-  - enter this command
-
-```bash
-docker-compose up -d --build
-```
-
-and
-
-```bash
-docker-compose run workspace python MainTB.py
-```
-
-If you get a response below, Your bot will have logged in your guild successfully.
-
-```bash
-Logged in as
-bot name
-bot id
-----message----
-```
-
-## How to custom
-
-If you want to change command prefix, change the value of prefix in .env
-
-For example, If you want to change prefix from "$" to "#", change .env from
-
-```:from
-PREFIX=$
-```
-
-to
-
-```:to
-PREFIX=#
-```
+(remake by.zel) https://glitch.com/~discordbot-example-js
