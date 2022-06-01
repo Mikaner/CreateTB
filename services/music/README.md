@@ -49,7 +49,12 @@ MikeTest.mp3 : 再生チェック用音声ファイル(assetsにも存在する)
 - loopqueueを設定したときのリアクション実装 ☑ ☐
 - moveの実装 ☑ ☐
 - handleListの表示改善(embedの利用) ☐ ☐
-- https://www.youtube.com/watch?v=gNp4VNr44hg ←これが再生されない ←410 Gone × □
+- playした際に再生されずにqueueに入る。(queueから押し出されない)バグ除去
+- 曲がぷつぷつになる原因の除去
+
+再生不可能リスト(StatusCode:410)
+- https://www.youtube.com/watch?v=gNp4VNr44hg
+- https://youtube.com/watch?v=x8VYWazR5mE
 
 # 参考URL
 https://qiita.com/HungTran/items/98e2b07a0fdd9e9b37fd

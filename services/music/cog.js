@@ -149,12 +149,12 @@ function playNext(server, message){
     server.queue.push(getCurrentQueue(message));
   }
   
-  const next_music = getFirstUnPlayedQueue(message)
+  const next_music = getFirstUnPlayedQueue(message);
   if(next_music){
     play(connections[message.guild.id], message);
   } else {
     //handleDisconnect(message);
-    console.log(servers[message.guild.id].dispatcher);
+    //console.log(servers[message.guild.id].dispatcher);
     console.log(`The ${message.guild.id} was finished to play!`);
     servers[message.guild.id].dispatcher.destroy();
     delete servers[message.guild.id].now_playing;
@@ -164,6 +164,7 @@ function playNext(server, message){
 async function play(connection, message){
   let server = servers[message.guild.id];
   server.now_playing = popFirstUnPlayedQueue(message);
+  console.log(server.now_playing);
   //now_playing[message.guild.id] = popFirstUnPlayedQueue(message);
   
   if(server.now_playing.local){
@@ -240,8 +241,8 @@ async function handlePlay(message, args){
   if(!isYoutubeUrl(message, url)){
     const r = await yts(args.join(' '));
     const video = await r.videos.slice(0, 1)[0];
-    console.log('------- video:-----------');
-    console.log(video);
+    //console.log('------- video:-----------');
+    //console.log(video);
     url = video.url;
     title = video.title;
   } else {
@@ -250,7 +251,9 @@ async function handlePlay(message, args){
   }
   
   if(!servers[message.guild.id]) { servers[message.guild.id] = makeServerStatus(); }
-  await servers[message.guild.id].queue.push({
+  
+  const server = servers[message.guild.id];
+  await server.queue.push({
     url: url,
     status: 0,
     local: false
@@ -258,8 +261,8 @@ async function handlePlay(message, args){
   
   message.channel.send(`${title}を追加しました。`); 
   
-  console.log(message.guild.id);
-  console.log(servers[message.guild.id]);
+  //console.log(message.guild.id);
+  //console.log(servers[message.guild.id]);
   
   if (!connections[message.guild.id]) {
     message.member.voice.channel.join()
@@ -268,7 +271,7 @@ async function handlePlay(message, args){
         await play(connections[message.guild.id], message);
       })
       .catch(console.log);
-  } else if(!servers[message.guild.id].dispatcher){
+  } else if(!server.dispatcher){
     await play(connections[message.guild.id], message);
   }
 }

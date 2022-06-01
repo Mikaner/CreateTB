@@ -5,10 +5,10 @@
   "main": "main.js",
   "dependencies": {
     "discord.js": "^12.x",
-    "ffmpeg-static": "^4.4.0",
-    "ytdl-core": "^4.10.0",
+    "ffmpeg-static": "^5.0.0",
+    "ytdl-core": "^4.11.0",
     "yt-search": "^2.10.3",
-    "@discordjs/opus": "^0.6.0"
+    "@discordjs/opus": "^0.7.0"
   },
   "engines": {
     "node": "12.x"
